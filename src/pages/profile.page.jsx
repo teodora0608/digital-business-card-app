@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
+import Navbar from "../common/navbar";
 
 const ProfilePage = () => {
+    const [isDarkMode, setIsDarkMode] = useState(false);
   const { username } = useParams()
   const [cardData, setCardData] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -331,60 +333,13 @@ END:VCARD`
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center space-x-3 transition-transform hover:scale-105">
-              <div className="w-8 h-8 bg-gradient-to-r from-fuchsia-500 to-violet-600 rounded-xl flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M4 4h16v2H4V4zm0 4h16v2H4V8zm0 4h16v2H4v-2zm0 4h16v2H4v-2z" />
-                </svg>
-              </div>
-              <span className="text-lg font-bold text-gray-900">KeepCard</span>
-            </Link>
-
-            <div className="flex items-center space-x-3">
-              <button
-                onClick={handleCopyLink}
-                className={`flex items-center px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                  copied
-                    ? "bg-green-100 text-green-700 border border-green-200"
-                    : "bg-white text-gray-700 border border-gray-200 hover:bg-gray-50"
-                }`}
-              >
-                {copied ? (
-                  <>
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    Copied!
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                      />
-                    </svg>
-                    Share
-                  </>
-                )}
-              </button>
-
-              <Link
-                to="/register"
-                className="px-4 py-2 bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white rounded-lg font-medium hover:from-fuchsia-600 hover:to-violet-700 transition-all duration-200"
-              >
-                Create Your Card
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+      
+      <Navbar
+  isDarkMode={isDarkMode}
+  setIsDarkMode={setIsDarkMode}
+  showShare={true}
+  showCreateCard={true}
+     />
 
       {/* Main Content */}
       <main className="container mx-auto px-6 py-12">
@@ -494,4 +449,3 @@ END:VCARD`
 }
 
 export default ProfilePage
-

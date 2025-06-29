@@ -1,33 +1,72 @@
-{/* Header */}
-      import { Link } from "react-router-dom";
+"use client"
 
-      const Navbar = ({ isDarkMode, setIsDarkMode }) => {
-        return (
-      <header
-        className={`sticky top-0 z-50 backdrop-blur-md transition-all duration-300 ${
-          isDarkMode ? "bg-gray-900/80 border-gray-800" : "bg-white/80 border-gray-100"
-        } border-b`}
-      >
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-500 rounded-2xl flex items-center justify-center shadow-lg">
-                <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M4 4h16v2H4V4zm0 4h16v2H4V8zm0 4h16v2H4v-2zm0 4h16v2H4v-2z" />
-                </svg>
-              </div>
-              <span
-                className={`text-2xl font-bold bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent`}
-              >
+import { Link } from "react-router-dom"
+
+const Navbar = ({
+  isDarkMode = false,
+  setIsDarkMode,
+  showLogout = false,
+  showProfileLink = false,
+  showShare = false,
+  showGetStarted = false,
+  cardData = null,
+}) => {
+  const handleLogout = () => {
+    // Add logout logic here
+    console.log("Logout clicked")
+  }
+
+  const handleShare = () => {
+    // Add share logic here
+    console.log("Share clicked")
+  }
+
+  const getInitials = (name) => {
+    if (!name) return "U"
+    return name.charAt(0).toUpperCase()
+  }
+
+  return (
+    <header
+      className={`sticky top-0 z-50 border-b backdrop-blur-sm transition-colors duration-300 ${
+        isDarkMode ? "bg-gray-900/80 border-gray-800" : "bg-white/80 border-gray-100"
+      }`}
+    >
+      <div className="container mx-auto px-6 py-4">
+        <div className="flex items-center justify-between">
+          {/* Left Side - Logo */}
+          <div className="flex items-center space-x-3">
+            {/* Hamburger Menu */}
+            <div className="w-10 h-10 bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-2xl flex items-center justify-center">
+              <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M4 6h16M4 12h16M4 18h16"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  fill="none"
+                />
+              </svg>
+            </div>
+
+            {/* Logo */}
+            <Link to="/" className="transition-transform hover:scale-105">
+              <span className="text-xl font-bold bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent">
                 KeepCard
               </span>
-            </div>
-            <div className="flex items-center space-x-4">
+            </Link>
+          </div>
+
+          {/* Right Side - Actions */}
+          <div className="flex items-center space-x-4">
+            {/* Dark Mode Toggle */}
+            {setIsDarkMode && (
               <button
                 onClick={() => setIsDarkMode(!isDarkMode)}
-                className={`p-2.5 rounded-xl transition-all duration-200 ${
+                className={`p-2 rounded-lg transition-all duration-200 ${
                   isDarkMode
-                    ? "text-gray-300 hover:text-white hover:bg-gray-800"
+                    ? "text-gray-300 hover:text-white hover:bg-gray-700"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 }`}
               >
@@ -51,27 +90,90 @@
                   </svg>
                 )}
               </button>
+            )}
+
+            {/* Share Button */}
+            {showShare && (
+              <button
+                onClick={handleShare}
+                className={`flex items-center px-3 py-2 rounded-lg transition-all duration-200 ${
+                  isDarkMode
+                    ? "text-gray-300 hover:text-white hover:bg-gray-700"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                }`}
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
+                  />
+                </svg>
+                Share
+              </button>
+            )}
+
+            {/* Sign In Button */}
+            {!showProfileLink && (
               <Link
                 to="/login"
-                className={`px-4 py-2.5 font-medium rounded-xl transition-all duration-200 ${
+                className={`px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
                   isDarkMode
-                    ? "text-gray-300 hover:text-white hover:bg-gray-800"
-                    : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                    ? "text-gray-300 hover:text-white hover:bg-gray-700"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 }`}
               >
                 Sign In
               </Link>
+            )}
+
+            {/* Get Started Button */}
+            {showGetStarted && (
               <Link
                 to="/register"
-                className="px-6 py-3 bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 text-white font-semibold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-200 shadow-md"
+                className="px-4 py-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white rounded-lg font-medium hover:from-violet-700 hover:to-fuchsia-700 transition-all duration-200"
               >
                 Get Started
               </Link>
-            </div>
+            )}
+
+            {/* Profile Link */}
+            {showProfileLink && cardData && (
+              <Link
+                to={`/profile/${cardData.customUrl}`}
+                className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 ${
+                  isDarkMode
+                    ? "text-gray-300 hover:text-white hover:bg-gray-700"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                }`}
+              >
+                <div className="w-8 h-8 bg-gradient-to-r from-fuchsia-600 to-violet-600 rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">{getInitials(cardData.name)}</span>
+                </div>
+                <span className="font-medium">{cardData.name}</span>
+              </Link>
+            )}
+
+            {/* Logout Button */}
+            {showLogout && (
+              <button
+                onClick={handleLogout}
+                className={`px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  isDarkMode
+                    ? "text-gray-300 hover:text-white hover:bg-gray-700"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                }`}
+              >
+                Logout
+              </button>
+            )}
           </div>
         </div>
-      </header> 
-      );
-    };
+      </div>
+    </header>
+  )
+}
 
-    export default Navbar;
+
+export default Navbar;
