@@ -1,4 +1,4 @@
-"use client"
+
 import { useState, useEffect } from "react"
 import Navbar from "../common/navbar"
 import Footer from "../common/footer"

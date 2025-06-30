@@ -1,4 +1,4 @@
-        {/* Features Grid */}
+       
         import { Link } from "react-router-dom"
    const FeaturesGrid = ({ isDarkMode, isVisible }) => {
             return(
