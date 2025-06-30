@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
-import Navbar from "../common/navbar";
+import Navbar from "../common/navbar"
+import Footer from "../common/footer"
 
 const ProfilePage = () => {
-    const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false)
   const { username } = useParams()
   const [cardData, setCardData] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -288,14 +289,16 @@ END:VCARD`
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 flex items-center justify-center">
+      <div
+        className={`min-h-screen transition-all duration-500 ${isDarkMode ? "bg-gray-900" : "bg-white"} flex items-center justify-center`}
+      >
         <div className="text-center">
           <div className="w-16 h-16 bg-gradient-to-r from-fuchsia-500 to-violet-600 rounded-3xl flex items-center justify-center mx-auto mb-4 animate-pulse">
             <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
               <path d="M4 4h16v2H4V4zm0 4h16v2H4V8zm0 4h16v2H4v-2zm0 4h16v2H4v-2z" />
             </svg>
           </div>
-          <p className="text-gray-600 font-medium">Loading profile...</p>
+          <p className={`${isDarkMode ? "text-gray-300" : "text-gray-600"} font-medium`}>Loading profile...</p>
         </div>
       </div>
     )
@@ -303,7 +306,9 @@ END:VCARD`
 
   if (!cardData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 flex items-center justify-center">
+      <div
+        className={`min-h-screen transition-all duration-500 ${isDarkMode ? "bg-gray-900" : "bg-white"} flex items-center justify-center`}
+      >
         <div className="text-center max-w-md mx-auto px-6">
           <div className="w-16 h-16 bg-gray-300 rounded-3xl flex items-center justify-center mx-auto mb-6">
             <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -315,8 +320,12 @@ END:VCARD`
               />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Profile Not Found</h1>
-          <p className="text-gray-600 mb-8">The profile you're looking for doesn't exist or has been removed.</p>
+          <h1 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"} mb-4`}>
+            Profile Not Found
+          </h1>
+          <p className={`${isDarkMode ? "text-gray-400" : "text-gray-600"} mb-8`}>
+            The profile you're looking for doesn't exist or has been removed.
+          </p>
           <Link
             to="/"
             className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white rounded-lg font-semibold hover:from-fuchsia-600 hover:to-violet-700 transition-all duration-200"
@@ -332,14 +341,8 @@ END:VCARD`
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
-      
-      <Navbar
-  isDarkMode={isDarkMode}
-  setIsDarkMode={setIsDarkMode}
-  showShare={true}
-  showCreateCard={true}
-     />
+    <div className={`min-h-screen transition-all duration-500 ${isDarkMode ? "bg-gray-900" : "bg-white"}`}>
+      <Navbar isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} showShare={true} showCreateCard={true} />
 
       {/* Main Content */}
       <main className="container mx-auto px-6 py-12">
@@ -351,7 +354,11 @@ END:VCARD`
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12">
             <button
               onClick={handleDownloadContact}
-              className="flex items-center justify-center px-6 py-4 bg-white border border-gray-200 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 hover:scale-105"
+              className={`flex items-center justify-center px-6 py-4 border rounded-xl font-semibold transition-all duration-200 hover:scale-105 ${
+                isDarkMode
+                  ? "bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700 hover:border-gray-600"
+                  : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300"
+              }`}
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -369,7 +376,9 @@ END:VCARD`
               className={`flex items-center justify-center px-6 py-4 rounded-xl font-semibold transition-all duration-200 hover:scale-105 ${
                 copied
                   ? "bg-green-100 text-green-700 border border-green-200"
-                  : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300"
+                  : isDarkMode
+                    ? "bg-gray-800 border border-gray-700 text-gray-300 hover:bg-gray-700 hover:border-gray-600"
+                    : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300"
               }`}
             >
               {copied ? (
@@ -396,14 +405,20 @@ END:VCARD`
           </div>
 
           {/* Call to Action */}
-          <div className="text-center bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
+          <div
+            className={`text-center rounded-2xl p-8 shadow-lg border ${
+              isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
+            }`}
+          >
             <div className="w-12 h-12 bg-gradient-to-r from-fuchsia-500 to-violet-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M4 4h16v2H4V4zm0 4h16v2H4V8zm0 4h16v2H4v-2zm0 4h16v2H4v-2z" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Create Your Own Digital Business Card</h2>
-            <p className="text-gray-600 mb-6">
+            <h2 className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"} mb-2`}>
+              Create Your Own Digital Business Card
+            </h2>
+            <p className={`${isDarkMode ? "text-gray-400" : "text-gray-600"} mb-6`}>
               Join thousands of professionals who use KeepCard to share their contact information instantly.
             </p>
             <Link
@@ -419,31 +434,7 @@ END:VCARD`
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-16">
-        <div className="container mx-auto px-6 py-8">
-          <div className="flex items-center justify-center space-x-6 text-sm text-gray-500">
-            <Link to="/" className="hover:text-gray-700 transition-colors">
-              KeepCard
-            </Link>
-            <span>•</span>
-            <a href="#" className="hover:text-gray-700 transition-colors">
-              Privacy
-            </a>
-            <span>•</span>
-            <a href="#" className="hover:text-gray-700 transition-colors">
-              Terms
-            </a>
-            <span>•</span>
-            <a href="#" className="hover:text-gray-700 transition-colors">
-              Contact
-            </a>
-          </div>
-          <div className="text-center mt-4">
-            <p className="text-xs text-gray-400">© 2024 KeepCard. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer isDarkMode={isDarkMode} />
     </div>
   )
 }
