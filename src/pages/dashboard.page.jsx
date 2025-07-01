@@ -3,10 +3,10 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import Navbar from "../common/navbar";
-import UserDetailsForm from "../components/user.details.form"
-import CustomUrl from "../components/custom.url";
-
-
+import UserDetailsForm from "../components/user-details-form"
+import CustomUrl from "../components/custom-url";
+import BadgeSelector from "../components/badge-selector"
+import BadgeDisplay from "../components/badge-display"
 
 const DashboardPage = () => {
   const [isDarkMode, setIsDarkMode] = useState(false)
@@ -47,15 +47,6 @@ const DashboardPage = () => {
       setSelectedBadges([...selectedBadges, badge])
     }
   }
-
-  const badges = [
-    { name: "Available for freelance", tooltip: "Open to freelance projects and contract work" },
-    { name: "Looking for new opportunities", tooltip: "Actively seeking new job opportunities" },
-    { name: "Open to collaboration", tooltip: "Interested in collaborating on projects" },
-    { name: "Remote only", tooltip: "Prefers remote work arrangements only" },
-    { name: "Hiring", tooltip: "Currently hiring for their team or company" },
-    { name: "Just updated", tooltip: "Recently updated their profile information" },
-  ]
 
   const templates = [
     {
@@ -127,36 +118,7 @@ const DashboardPage = () => {
         </p>
 
         {/* Professional Badges */}
-        {selectedBadges.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-6">
-            {selectedBadges.map((badge) => (
-              <span
-                key={badge}
-                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium transition-all duration-300 ${
-                  textColor === "text-white"
-                    ? "bg-white/20 text-white border border-white/30"
-                    : cardData.template === "light"
-                      ? "bg-purple-100 text-purple-700 border border-purple-200"
-                      : cardData.template === "dark"
-                        ? "bg-slate-700 text-slate-200 border border-slate-600"
-                        : cardData.template === "corporate"
-                          ? "bg-blue-500 text-white border border-blue-400"
-                          : "bg-white/20 text-white border border-white/30"
-                }`}
-              >
-                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
-                  />
-                </svg>
-                {badge}
-              </span>
-            ))}
-          </div>
-        )}
+        <BadgeDisplay badges={selectedBadges} template={cardData.template} textColor={textColor} />
 
         <div className="grid grid-cols-2 gap-3 mb-6">
           <button
@@ -285,22 +247,22 @@ const DashboardPage = () => {
     }
   }
 
+
+
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
-
-
-<Navbar
-  isDarkMode={isDarkMode}
-  setIsDarkMode={setIsDarkMode}
-  showLogout={true}
-  showProfileLink={true}
-  showShare={false}
-  showGetStarted={false}
-  cardData={{
-    name: "Teodora",
-    customUrl: "teodora-profile"
-  }}
-/>
+      <Navbar
+        isDarkMode={isDarkMode}
+        setIsDarkMode={setIsDarkMode}
+        showLogout={true}
+        showProfileLink={true}
+        showShare={false}
+        showGetStarted={false}
+        cardData={{
+          name: "Teodora",
+          customUrl: "teodora-profile",
+        }}
+      />
 
       {/* Sticky Save Button */}
       <div className="sticky top-0 z-10 bg-gradient-to-r from-fuchsia-500 to-violet-600 shadow-lg">
@@ -341,72 +303,19 @@ const DashboardPage = () => {
           {/* Left Panel - Editor */}
           <div className="space-y-8">
             {/* Custom URL */}
-<CustomUrl
-  customUrl={cardData.customUrl}
-  onUrlChange={(newUrl) => setCardData({ ...cardData, customUrl: newUrl })}
-  isDarkMode={isDarkMode}
-/>
+            <CustomUrl
+              customUrl={cardData.customUrl}
+              onUrlChange={(newUrl) => setCardData({ ...cardData, customUrl: newUrl })}
+              isDarkMode={isDarkMode}
+            />
 
             {/* Professional Badges */}
-            <div
-              className={`${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-2xl p-8 shadow-lg border transition-all duration-300 hover:shadow-xl`}
-            >
-              <div className="flex items-center mb-6">
-                <svg
-                  className={`w-6 h-6 ${isDarkMode ? "text-gray-400" : "text-gray-600"} mr-3`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
-                  />
-                </svg>
-                <h3
-                  className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"} transition-colors duration-300`}
-                >
-                  Professional Badges
-                </h3>
-              </div>
-              <p className={`text-sm ${isDarkMode ? "text-gray-500" : "text-gray-500"} mb-6`}>
-                Select up to 2 badges to display on your card
-              </p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {badges.map((badge) => (
-                  <button
-                    key={badge.name}
-                    onClick={() => toggleBadge(badge.name)}
-                    title={badge.tooltip}
-                    className={`p-4 rounded-xl border-2 text-sm font-medium transition-all duration-200 hover:scale-105 ${
-                      selectedBadges.includes(badge.name)
-                        ? "border-purple-400 bg-purple-50 text-purple-700 shadow-lg"
-                        : isDarkMode
-                          ? "border-gray-600 bg-gray-700 text-gray-300 hover:border-gray-500 hover:bg-gray-600"
-                          : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50"
-                    }`}
-                  >
-                    <div className="flex items-center">
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
-                        />
-                      </svg>
-                      {badge.name}
-                    </div>
-                  </button>
-                ))}
-              </div>
-              <p className={`text-xs ${isDarkMode ? "text-gray-500" : "text-gray-500"} mt-4 text-center`}>
-                {selectedBadges.length}/2 badges selected
-              </p>
-            </div>
+            <BadgeSelector
+              selectedBadges={selectedBadges}
+              onBadgeToggle={toggleBadge}
+              isDarkMode={isDarkMode}
+              maxBadges={2}
+            />
 
             {/* Profile Photo */}
             <div
@@ -437,12 +346,7 @@ const DashboardPage = () => {
               </div>
             </div>
 
-       
-<UserDetailsForm 
-  cardData={cardData}
-  handleInputChange={handleInputChange}
-  isDarkMode={isDarkMode}
-/>
+            <UserDetailsForm cardData={cardData} handleInputChange={handleInputChange} isDarkMode={isDarkMode} />
 
             {/* Visual Template */}
             <div
@@ -539,7 +443,7 @@ const DashboardPage = () => {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                     d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
                     />
                   </svg>
                   Copy Link
@@ -555,7 +459,7 @@ const DashboardPage = () => {
                       d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
                     />
                   </svg>
-                  Generate QR Code 
+                  Generate QR Code
                 </button>
                 <button className="w-full flex items-center justify-center px-6 py-4 bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white rounded-xl font-semibold transition-all duration-200 hover:scale-105 hover:shadow-lg">
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

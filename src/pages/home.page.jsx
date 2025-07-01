@@ -2,9 +2,9 @@
 import { useState, useEffect } from "react"
 import Navbar from "../common/navbar"
 import Footer from "../common/footer"
-import HeroSection from "../components/hero.section.jsx"
-import FeaturesGrid from "../components/features.grid.jsx"
-import WhyChoose from "../components/why.choose.jsx"
+import HeroSection from "../components/hero-section.jsx"
+import FeaturesGrid from "../components/features-grid.jsx"
+import WhyChoose from "../components/why-choose.jsx"
 
 const HomePage = () => {
   const [isDarkMode, setIsDarkMode] = useState(false)
