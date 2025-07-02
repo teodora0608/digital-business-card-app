@@ -7,6 +7,7 @@ import UserDetailsForm from "../components/user-details-form"
 import CustomUrl from "../components/custom-url";
 import BadgeSelector from "../components/badge-selector"
 import BadgeDisplay from "../components/badge-display"
+import ProfilePhoto from "../common/profile-picure";
 
 const DashboardPage = () => {
   const [isDarkMode, setIsDarkMode] = useState(false)
@@ -319,32 +320,23 @@ const DashboardPage = () => {
 
             {/* Profile Photo */}
             <div
-              className={`${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-2xl p-8 shadow-lg border transition-all duration-300 hover:shadow-xl`}
+              className={`${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-2xl p-6 shadow-lg border`}
             >
-              <h3
-                className={`text-xl font-bold mb-6 ${isDarkMode ? "text-white" : "text-gray-900"} transition-colors duration-300`}
-              >
-                Profile Photo
-              </h3>
-              <div className="flex items-center space-x-6">
-                <div className="w-20 h-20 bg-gradient-to-r from-fuchsia-500 to-violet-600 rounded-full flex items-center justify-center transition-transform hover:scale-110">
-                  <span className="text-white font-bold text-2xl">t</span>
-                </div>
-                <button
-                  className={`flex items-center px-6 py-3 border-2 rounded-xl font-medium transition-all duration-200 hover:scale-105 ${isDarkMode ? "border-gray-600 hover:bg-gray-700 text-gray-300 hover:border-gray-500" : "border-gray-300 hover:bg-gray-50 text-gray-700 hover:border-gray-400"}`}
-                >
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                    />
-                  </svg>
-                  Upload Photo
-                </button>
-              </div>
+              <h2 className={`text-xl font-bold mb-4 ${isDarkMode ? "text-white" : "text-gray-900"}`}>Profile Photo</h2>
+
+              <ProfilePhoto
+                profileImage={cardData.profileImage}
+                template={cardData.template}
+                isDarkMode={isDarkMode}
+                size="w-20 h-20"
+                showUploadButton={true}
+                onUploadClick={() => {
+                  // Placeholder pentru viitoarea funcționalitate
+                  alert("Upload functionality will be added later!")
+                }}
+              />
             </div>
+
 
             <UserDetailsForm cardData={cardData} handleInputChange={handleInputChange} isDarkMode={isDarkMode} />
 
