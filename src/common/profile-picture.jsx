@@ -102,4 +102,4 @@ const ProfilePhoto = ({
   )
 }
 
-export default ProfilePhoto
+export default ProfilePhoto 
