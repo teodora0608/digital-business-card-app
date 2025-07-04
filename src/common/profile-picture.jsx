@@ -7,7 +7,7 @@ const ProfilePhoto = ({
   size = "w-20 h-20",
   showUploadButton = true,
   onUploadClick = () => {},
-  name = "Teodora", // Adaugă prop pentru nume
+  name = "User", // Adaugă prop pentru nume
 }) => {
   // Get gradient based on template
   const getGradient = () => {
@@ -20,7 +20,7 @@ const ProfilePhoto = ({
         return "bg-white"
       case "creative":
       default:
-        return "bg-gradient-to-r from-fuchsia-500 to-violet-600"
+        return "bg-white" // Changed from gradient to white for creative template
     }
   }
 
@@ -35,7 +35,7 @@ const ProfilePhoto = ({
         return "text-blue-600"
       case "creative":
       default:
-        return "text-white"
+        return "text-fuchsia-600" // Changed from white to fuchsia for better contrast on white background
     }
   }
 

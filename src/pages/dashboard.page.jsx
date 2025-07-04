@@ -1,5 +1,3 @@
-
-
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import Navbar from "../common/navbar";
@@ -7,7 +5,11 @@ import UserDetailsForm from "../components/user-details-form"
 import CustomUrl from "../components/custom-url";
 import BadgeSelector from "../components/badge-selector"
 import BadgeDisplay from "../components/badge-display"
-import ProfilePhoto from "../common/profile-picure";
+import ProfilePhoto from "../common/profile-picture";
+import BusinessCard from "../common/business-card";
+import ActionButtons from "../common/action-buttons";
+import VisualTemplate from "../common/visual-template";
+import SaveChanges from "../common/save-changes";
 
 const DashboardPage = () => {
   const [isDarkMode, setIsDarkMode] = useState(false)
@@ -49,6 +51,7 @@ const DashboardPage = () => {
     }
   }
 
+  // Template data pentru TemplateSelector
   const templates = [
     {
       name: "Light",
@@ -69,6 +72,92 @@ const DashboardPage = () => {
       name: "Creative",
       color: "bg-gradient-to-r from-pink-500 to-purple-600",
       preview: "Vibrant gradient for creative professionals",
+    },
+  ]
+
+  // Handler pentru selectarea template-ului
+  const handleTemplateSelect = (templateName) => {
+    setCardData({ ...cardData, template: templateName })
+  }
+
+  // Handlers pentru action buttons
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(`https://keepcard.com/${cardData.customUrl}`)
+      // Poți adăuga un toast notification aici
+      console.log("Link copied!")
+    } catch (err) {
+      console.error("Failed to copy link:", err)
+    }
+  }
+
+  const handleGenerateQR = () => {
+    // Placeholder pentru QR code generation
+    alert("QR Code generation will be implemented later!")
+  }
+
+  const handleShareCard = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${cardData.name} - Digital Business Card`,
+          text: `Check out ${cardData.name}'s digital business card`,
+          url: `https://keepcard.com/${cardData.customUrl}`,
+        })
+      } catch (err) {
+        console.log("Error sharing:", err)
+        handleCopyLink()
+      }
+    } else {
+      handleCopyLink()
+    }
+  }
+
+  // Array de butoane pentru dashboard
+  const dashboardButtons = [
+    {
+      label: "Copy Link",
+      onClick: handleCopyLink,
+      icon: (
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+          />
+        </svg>
+      ),
+    },
+    {
+      label: "Generate QR Code",
+      onClick: handleGenerateQR,
+      icon: (
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
+          />
+        </svg>
+      ),
+    },
+    {
+      label: "Share Card",
+      onClick: handleShareCard,
+      icon: (
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
+          />
+        </svg>
+      ),
+      extraClasses:
+        "bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white hover:from-fuchsia-600 hover:to-violet-700 hover:shadow-lg border-0",
     },
   ]
 
@@ -248,8 +337,6 @@ const DashboardPage = () => {
     }
   }
 
-
-
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
       <Navbar
@@ -266,38 +353,14 @@ const DashboardPage = () => {
       />
 
       {/* Sticky Save Button */}
-      <div className="sticky top-0 z-10 bg-gradient-to-r from-fuchsia-500 to-violet-600 shadow-lg">
-        <div className="container mx-auto px-6 py-3">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-white">Edit Your Card</h1>
-            <button
-              onClick={handleSave}
-              className={`flex items-center px-6 py-2 bg-white text-fuchsia-600 rounded-lg font-semibold transition-all duration-200 hover:bg-gray-100 hover:scale-105 ${isSaved ? "bg-green-100 text-green-700" : ""}`}
-            >
-              {isSaved ? (
-                <>
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  Saved!
-                </>
-              ) : (
-                <>
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12"
-                    />
-                  </svg>
-                  Save Changes
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
+<div className="sticky top-0 z-10 bg-gradient-to-r from-fuchsia-500 to-violet-600 shadow-lg">
+  <div className="container mx-auto px-6 py-3">
+    <div className="flex items-center justify-between">
+      <h1 className="text-2xl font-bold text-white">Edit Your Card</h1>
+      <SaveChanges onClick={handleSave} isSaved={isSaved} />
+    </div>
+  </div>
+</div>
 
       <div className="container mx-auto px-6 py-8">
         <div className="grid lg:grid-cols-2 gap-12">
@@ -337,10 +400,9 @@ const DashboardPage = () => {
               />
             </div>
 
-
             <UserDetailsForm cardData={cardData} handleInputChange={handleInputChange} isDarkMode={isDarkMode} />
 
-            {/* Visual Template */}
+            {/* Visual Template  */}
             <div
               className={`${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-2xl p-8 shadow-lg border transition-all duration-300 hover:shadow-xl`}
             >
@@ -349,37 +411,12 @@ const DashboardPage = () => {
               >
                 Visual Template
               </h3>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                {templates.map((template) => (
-                  <button
-                    key={template.name}
-                    onClick={() => setCardData({ ...cardData, template: template.name.toLowerCase() })}
-                    title={template.preview}
-                    className={`relative aspect-square rounded-2xl ${template.color} border-3 transition-all duration-200 hover:scale-105 ${
-                      cardData.template === template.name.toLowerCase()
-                        ? "border-purple-500 ring-4 ring-purple-200 shadow-xl"
-                        : isDarkMode
-                          ? "border-gray-600 hover:border-gray-500"
-                          : "border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
-                    <div className="absolute inset-0 flex flex-col items-center justify-center p-3">
-                      <span
-                        className={`text-sm font-bold ${template.name === "Light" ? "text-gray-900" : "text-white"} mb-1`}
-                      >
-                        {template.name}
-                      </span>
-                      {cardData.template === template.name.toLowerCase() && (
-                        <div className="absolute top-2 right-2">
-                          <svg className="w-5 h-5 text-purple-500" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                        </div>
-                      )}
-                    </div>
-                  </button>
-                ))}
-              </div>
+              <VisualTemplate
+                templates={templates}
+                selectedTemplate={cardData.template}
+                onSelectTemplate={handleTemplateSelect}
+                isDarkMode={isDarkMode}
+              />
             </div>
           </div>
 
@@ -398,26 +435,10 @@ const DashboardPage = () => {
                   <button
                     className={`p-2 rounded-lg transition-all duration-200 ${isDarkMode ? "text-gray-400 hover:text-white hover:bg-gray-700" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"}`}
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-                      />
-                    </svg>
                   </button>
                   <button
                     className={`p-2 rounded-lg transition-all duration-200 ${isDarkMode ? "text-gray-400 hover:text-white hover:bg-gray-700" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"}`}
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
-                      />
-                    </svg>
                   </button>
                 </div>
               </div>
@@ -426,45 +447,7 @@ const DashboardPage = () => {
               <div className="flex justify-center mb-8">{renderPreviewCard()}</div>
 
               {/* Action Buttons */}
-              <div className="space-y-4">
-                <button
-                  className={`w-full flex items-center justify-center px-6 py-4 border-2 rounded-xl font-semibold transition-all duration-200 hover:scale-105 ${isDarkMode ? "border-gray-600 hover:bg-gray-700 text-gray-300 hover:border-gray-500" : "border-gray-300 hover:bg-gray-50 text-gray-700 hover:border-gray-400"}`}
-                >
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                    />
-                  </svg>
-                  Copy Link
-                </button>
-                <button
-                  className={`w-full flex items-center justify-center px-6 py-4 border-2 rounded-xl font-semibold transition-all duration-200 hover:scale-105 ${isDarkMode ? "border-gray-600 hover:bg-gray-700 text-gray-300 hover:border-gray-500" : "border-gray-300 hover:bg-gray-50 text-gray-700 hover:border-gray-400"}`}
-                >
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
-                    />
-                  </svg>
-                  Generate QR Code
-                </button>
-                <button className="w-full flex items-center justify-center px-6 py-4 bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white rounded-xl font-semibold transition-all duration-200 hover:scale-105 hover:shadow-lg">
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
-                    />
-                  </svg>
-                  Share Card
-                </button>
-              </div>
+              <ActionButtons buttons={dashboardButtons} isDarkMode={isDarkMode} />
             </div>
           </div>
         </div>
