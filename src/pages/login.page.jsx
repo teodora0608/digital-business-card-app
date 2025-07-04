@@ -1,26 +1,34 @@
-import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import FormGroup from "../common/form-group"
-import PasswordField from "../common/password-field"
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import FormGroup from "../common/form-group";
+import PasswordField from "../common/password-field";
+import { loginUser } from "../api/auth.js";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-  })
-  const navigate = useNavigate()
+  });
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    navigate("/dashboard")
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      await loginUser(formData.email, formData.password);
+      navigate("/dashboard");
+    } catch (error) {
+      console.error(error);
+      alert(error.message);
+    }
+  };
 
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
-    })
-  }
+    });
+  };
 
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
@@ -94,7 +102,7 @@ const LoginPage = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default LoginPage
+export default LoginPage;
