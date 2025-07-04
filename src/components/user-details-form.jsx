@@ -1,5 +1,3 @@
-"use client"
-
 const UserDetailsForm = ({ cardData, handleInputChange, isDarkMode }) => {
   return (
     <div
@@ -27,7 +25,7 @@ const UserDetailsForm = ({ cardData, handleInputChange, isDarkMode }) => {
               name="name"
               value={cardData.name}
               onChange={handleInputChange}
-              className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent ${
+              className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 ${
                 isDarkMode
                   ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                   : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
@@ -48,7 +46,7 @@ const UserDetailsForm = ({ cardData, handleInputChange, isDarkMode }) => {
               name="title"
               value={cardData.title}
               onChange={handleInputChange}
-              className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent ${
+              className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 ${
                 isDarkMode
                   ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                   : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
@@ -72,7 +70,7 @@ const UserDetailsForm = ({ cardData, handleInputChange, isDarkMode }) => {
             name="location"
             value={cardData.location}
             onChange={handleInputChange}
-            className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent ${
+            className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 ${
               isDarkMode
                 ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                 : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
@@ -95,7 +93,7 @@ const UserDetailsForm = ({ cardData, handleInputChange, isDarkMode }) => {
             value={cardData.bio}
             onChange={handleInputChange}
             rows={4}
-            className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent resize-none ${
+            className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 resize-none ${
               isDarkMode
                 ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                 : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
@@ -124,7 +122,7 @@ const UserDetailsForm = ({ cardData, handleInputChange, isDarkMode }) => {
                 name="email"
                 value={cardData.email}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent ${
+                className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 ${
                   isDarkMode
                     ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                     : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
@@ -145,7 +143,7 @@ const UserDetailsForm = ({ cardData, handleInputChange, isDarkMode }) => {
                 name="phone"
                 value={cardData.phone}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent ${
+                className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 ${
                   isDarkMode
                     ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                     : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
@@ -174,7 +172,7 @@ const UserDetailsForm = ({ cardData, handleInputChange, isDarkMode }) => {
                 name="website"
                 value={cardData.website}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent ${
+                className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 ${
                   isDarkMode
                     ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                     : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
@@ -197,7 +195,7 @@ const UserDetailsForm = ({ cardData, handleInputChange, isDarkMode }) => {
                   name="linkedin"
                   value={cardData.linkedin}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent ${
+                  className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 ${
                     isDarkMode
                       ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                       : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
@@ -218,7 +216,7 @@ const UserDetailsForm = ({ cardData, handleInputChange, isDarkMode }) => {
                   name="github"
                   value={cardData.github}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent ${
+                  className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 ${
                     isDarkMode
                       ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                       : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"

@@ -33,4 +33,3 @@ const VisualTemplate = ({ templates, selectedTemplate, onSelectTemplate, isDarkM
 }
 
 export default VisualTemplate
-

@@ -2,17 +2,19 @@ const BadgeDisplay = ({ badges = [], template = "creative", textColor = "text-wh
   if (!badges || badges.length === 0) return null
 
   const getBadgeStyle = () => {
+    // Folosim aceleași stiluri pentru toate template-urile pentru consistență
     if (textColor === "text-white") {
       return "bg-white/20 text-white border border-white/30"
     }
 
+    // Pentru template-ul light, folosim același stil ca pentru celelalte
     switch (template) {
       case "light":
-        return "bg-purple-100 text-purple-700 border border-purple-200"
+        return "bg-white/20 text-purple-700 border border-purple-200/50" // Schimbat pentru consistență
       case "dark":
-        return "bg-slate-700 text-slate-200 border border-slate-600"
+        return "bg-white/20 text-white border border-white/30"
       case "corporate":
-        return "bg-blue-500 text-white border border-blue-400"
+        return "bg-white/20 text-white border border-white/30"
       default:
         return "bg-white/20 text-white border border-white/30"
     }

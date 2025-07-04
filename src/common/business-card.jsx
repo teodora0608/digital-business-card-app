@@ -1,3 +1,4 @@
+"use client"
 
 import ProfilePhoto from "../common/profile-picture"
 import BadgeDisplay from "../components/badge-display"
@@ -269,7 +270,7 @@ const BusinessCard = ({
   switch (cardData.template) {
     case "light":
       return (
-        <div className={`${cardClasses} bg-white border-2 border-gray-200`} onClick={handleCardClick}>
+        <div className={`${cardClasses} bg-white border border-gray-300`} onClick={handleCardClick}>
           {baseCardContent(
             "text-gray-900",
             "bg-transparent border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 active:bg-gray-100 active:scale-95 focus:outline-none focus:ring-2 focus:ring-gray-300",
@@ -278,7 +279,7 @@ const BusinessCard = ({
       )
     case "dark":
       return (
-        <div className={`${cardClasses} bg-slate-900 border border-slate-700 text-white`} onClick={handleCardClick}>
+        <div className={`${cardClasses} bg-slate-900 border border-slate-600 text-white`} onClick={handleCardClick}>
           {baseCardContent(
             "text-white",
             "bg-transparent border border-slate-600 text-white hover:bg-slate-800 hover:border-slate-500 active:bg-slate-700 active:scale-95 focus:outline-none focus:ring-2 focus:ring-slate-500",
@@ -287,7 +288,7 @@ const BusinessCard = ({
       )
     case "corporate":
       return (
-        <div className={`${cardClasses} bg-blue-600 text-white`} onClick={handleCardClick}>
+        <div className={`${cardClasses} bg-blue-600 border border-blue-400 text-white`} onClick={handleCardClick}>
           {baseCardContent(
             "text-white",
             "bg-transparent border border-blue-400 text-white hover:bg-blue-500 hover:border-blue-300 active:bg-blue-700 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-300",
@@ -298,7 +299,7 @@ const BusinessCard = ({
     default:
       return (
         <div
-          className={`${cardClasses} bg-gradient-to-br from-fuchsia-500 to-violet-600 text-white`}
+          className={`${cardClasses} bg-gradient-to-br from-fuchsia-500 to-violet-600 border border-white/30 text-white`}
           onClick={handleCardClick}
         >
           {baseCardContent(
