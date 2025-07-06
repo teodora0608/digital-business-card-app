@@ -13,7 +13,7 @@ export const registerUser = async (email, password, name) => {
   const uid            = userCredential.user.uid;
 
   // 2. Creezi documentul minimal în Firestore
-  await setDoc(doc(db, "users", uid), {
+  await setDoc(doc(db, "profiles", uid), {
     uid,
     fullName: name || "",
     email

@@ -1,8 +1,10 @@
-export default function slugify(str) {
-  return str
+export const generateSlug = (text) => {
+  return text
+    .toString()
     .toLowerCase()
     .trim()
-    .replace(/\s+/g, '-')
-    .replace(/[^\w\-]+/g, '')
-    .replace(/\-\-+/g, '-');
-}
+    .replace(/&/g, '-and-')      
+    .replace(/[^a-z0-9]+/g, '-') 
+    .replace(/--+/g, '-')        
+    .replace(/^-+|-+$/g, '');    
+};

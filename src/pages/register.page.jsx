@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import FormGroup from "../common/form-group";
 import PasswordField from "../common/password-field";
-import { registerUser } from "../api/auth"; // acum include și creare profil Firestore
+import { registerUser } from "../api/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../api/firebase-config"
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -22,14 +24,20 @@ const RegisterPage = () => {
     }
 
     try {
-      // apel unificat: Auth + Firestore (profil default)
-      await registerUser(
+      const { user } = await registerUser(
         formData.email,
         formData.password,
         formData.name
       );
 
-      // după succes, merg la dashboard
+      const uid = user.uid;
+
+      await setDoc(doc(db, "profiles", uid), {
+        fullName: formData.name,
+        email: formData.email,
+        customUrl: uid,
+      });
+
       navigate("/dashboard");
     } catch (err) {
       console.error(err);
