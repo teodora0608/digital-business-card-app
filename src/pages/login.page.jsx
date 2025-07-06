@@ -5,61 +5,58 @@ import PasswordField from "../common/password-field";
 import { loginUser } from "../api/auth.js";
 
 const LoginPage = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");     // stocăm textul de eroare
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
 
-    try {
-      await loginUser(formData.email, formData.password);
-      navigate("/dashboard");
-    } catch (error) {
-      console.error(error);
-      alert(error.message);
+  try {
+    await loginUser(formData.email, formData.password);
+    navigate("/dashboard");
+  } catch (err) {
+    switch (err.code) {
+      case "auth/wrong-password":
+        setError("Parola este incorectă. Încearcă din nou.");
+        break;
+      case "auth/user-not-found":
+        setError("Nu există niciun cont cu acest email.");
+        break;
+      case "auth/invalid-email":
+        setError("Te rog introdu o adresă de email validă.");
+        break;
+      case "auth/invalid-credential":
+        setError("Email sau parolă incorectă.");
+        break;
+      default:
+        setError("A apărut o eroare: " + err.message);
     }
-  };
-
+  }
+};
   const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData(f => ({ ...f, [e.target.name]: e.target.value }));
+    setError("");  // ștergem eroarea când userul începe să tasteze
   };
 
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
-      {/* Back to Home */}
-      <Link
-        to="/"
-        className="absolute top-6 left-6 flex items-center text-gray-400 hover:text-white transition-colors"
-      >
-        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
-        Back to Home
+      {/* Back link & titlu */}
+      <Link to="/" className="absolute top-6 left-6 text-gray-400 hover:text-white">
+        ← Back to Home
       </Link>
-
       <div className="w-full max-w-md">
-        {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6">
-            <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M4 4h16v2H4V4zm0 4h16v2H4V8zm0 4h16v2H4v-2zm0 4h16v2H4v-2z" />
-            </svg>
-          </div>
           <h1 className="text-3xl font-bold text-white mb-2">Welcome back</h1>
           <p className="text-gray-400">
             Sign in to your KeepCard account to manage your digital business cards
           </p>
         </div>
 
-        {/* Form */}
+        {/* formular */}
         <div className="bg-slate-800 rounded-2xl p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
             <FormGroup
               label="Email Address"
               name="email"
@@ -79,6 +76,13 @@ const LoginPage = () => {
               required
             />
 
+            {/* mesajul de eroare afișat sub câmpul de parolă */}
+            {error && (
+              <p className="text-red-500 text-sm mt-1">
+                {error}
+              </p>
+            )}
+
             <button
               type="submit"
               className="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors"
@@ -86,12 +90,6 @@ const LoginPage = () => {
               Sign In
             </button>
           </form>
-
-          <div className="mt-4 text-center">
-            <a href="#" className="text-purple-400 hover:text-purple-300 text-sm">
-              Forgot your password?
-            </a>
-          </div>
 
           <div className="mt-6 text-center">
             <span className="text-gray-400">Don't have an account? </span>

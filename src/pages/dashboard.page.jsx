@@ -1,111 +1,127 @@
-import { useState } from "react"
-import { Link } from "react-router-dom"
-import Navbar from "../common/navbar";
+"use client"
+
+// src/pages/DashboardPage.jsx
+import { useState, useEffect } from "react"
+import { onAuthStateChanged } from "firebase/auth"
+import { auth } from "../api/firebase-config"
+import { getUserProfile, updateUserProfile } from "../api/profile"
+import Navbar from "../common/navbar"
 import UserDetailsForm from "../components/user-details-form"
-import CustomUrl from "../components/custom-url";
+import CustomUrl from "../components/custom-url"
 import BadgeSelector from "../components/badge-selector"
-import BadgeDisplay from "../components/badge-display"
-import ProfilePhoto from "../common/profile-picture";
-import BusinessCard from "../common/business-card";
-import ActionButtons from "../common/action-buttons";
-import VisualTemplate from "../common/visual-template";
-import SaveChanges from "../common/save-changes";
+import ProfilePhoto from "../common/profile-picture"
+import BusinessCard from "../common/business-card"
+import ActionButtons from "../common/action-buttons"
+import VisualTemplate from "../common/visual-template"
+import SaveChanges from "../common/save-changes"
 
 const DashboardPage = () => {
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
+  const [userUid, setUserUid] = useState(null)
+  const [loading, setLoading] = useState(true)
 
+  // 1️⃣ Pe mount abonează-te la auth și salvează UID-ul
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserUid(user.uid)
+      } else {
+        setUserUid(null)
+        // dacă nu e logat: eventual redirect la /login
+      }
+    })
+    return () => unsub()
+  }, [])
+
+// 2️⃣ datele profilului: ținem doar fullName + email ca fallback
   const [cardData, setCardData] = useState({
-    name: "teodora",
-    title: "Senior Product Designer",
-    location: "San Francisco, CA",
-    bio: "Passionate about creating beautiful, user-centered digital experiences. 5+ years in product design with a focus on SaaS platforms.",
-    email: "sdadsasssdas@gmail.com",
-    phone: "+1 (555) 123-4567",
-    website: "alexjohnson.design",
-    linkedin: "linkedin.com/in/alexjohnson",
-    github: "github.com/alexjohnson",
-    customUrl: "alex-johnson",
-    template: "creative",
+    fullName: "",
+    email: "",
+    jobTitle: "",
+    location: "",
+    bio: "",
+    phone: "",
+    website: "",
+    linkedin: "",
+    github: "",
+    customUrl: "",
+    template: "creative", // Default template
+    profileImage: "",
   })
+  const [selectedBadges, setSelectedBadges] = useState([])
 
-  const [selectedBadges, setSelectedBadges] = useState(["Available for freelance", "Open to collaboration"])
+  // 3️⃣ când avem userUid, tragem profilul din Firestore
+  useEffect(() => {
+    if (!userUid) return
+    const fetchProfile = async () => {
+      try {
+        const data = await getUserProfile(userUid)
+        if (data) {
+          // Separate badges from the rest of the card data
+          const { badges, ...details } = data
+          setCardData({
+            fullName: details.fullName || "",
+            email: details.email || "",
+            jobTitle: details.jobTitle || "",
+            location: details.location || "",
+            bio: details.bio || "",
+            phone: details.phone || "",
+            website: details.website || "",
+            linkedin: details.linkedin || "",
+            github: details.github || "",
+            customUrl: details.customUrl || "",
+            template: details.visualTemplate || "creative",
+            profileImage: details.profileImage || "",
+          })
+          setSelectedBadges(badges || [])
+        }
+      } catch (err) {
+        console.error("Could not load profile:", err)
+        alert("Error loading profile.")
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProfile()
+  }, [userUid])
 
-  const handleInputChange = (e) => {
-    setCardData({
-      ...cardData,
-      [e.target.name]: e.target.value,
+  if (loading) return <div>Loading profile…</div>
+
+  // 4️⃣ handlers UI (neschimbate)
+  const handleInputChange = (e) => setCardData((c) => ({ ...c, [e.target.name]: e.target.value }))
+
+  const toggleBadge = (badge) => {
+    setSelectedBadges((prevBadges) => {
+      const hasBadge = prevBadges.includes(badge)
+      if (hasBadge) {
+        return prevBadges.filter((b) => b !== badge)
+      }
+      if (prevBadges.length < 2) {
+        return [...prevBadges, badge]
+      }
+      return prevBadges
     })
   }
 
-  const handleSave = () => {
-    setIsSaved(true)
-    setTimeout(() => setIsSaved(false), 2000)
-  }
+  const handleTemplateSelect = (templateName) => setCardData((c) => ({ ...c, template: templateName }))
 
-  const toggleBadge = (badge) => {
-    if (selectedBadges.includes(badge)) {
-      setSelectedBadges(selectedBadges.filter((b) => b !== badge))
-    } else if (selectedBadges.length < 2) {
-      setSelectedBadges([...selectedBadges, badge])
-    }
-  }
-
-  // Template data pentru TemplateSelector
-  const templates = [
-    {
-      name: "Light",
-      color: "bg-white border-2 border-purple-300",
-      preview: "Clean white design with purple accents",
-    },
-    {
-      name: "Dark",
-      color: "bg-slate-900",
-      preview: "Sleek dark theme with modern styling",
-    },
-    {
-      name: "Corporate",
-      color: "bg-blue-600",
-      preview: "Professional blue corporate theme",
-    },
-    {
-      name: "Creative",
-      color: "bg-gradient-to-r from-pink-500 to-purple-600",
-      preview: "Vibrant gradient for creative professionals",
-    },
-  ]
-
-  // Handler pentru selectarea template-ului
-  const handleTemplateSelect = (templateName) => {
-    setCardData({ ...cardData, template: templateName })
-  }
-
-  // Handlers pentru action buttons
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(`https://keepcard.com/${cardData.customUrl}`)
-      // Poți adăuga un toast notification aici
-      console.log("Link copied!")
-    } catch (err) {
-      console.error("Failed to copy link:", err)
-    }
+    } catch {}
   }
 
-  const handleGenerateQR = () => {
-    // Placeholder pentru QR code generation
-    alert("QR Code generation will be implemented later!")
-  }
+  const handleGenerateQR = () => alert("QR Code generation will be implemented later!")
 
   const handleShareCard = async () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${cardData.name} - Digital Business Card`,
-          text: `Check out ${cardData.name}'s digital business card`,
+          title: `${cardData.fullName} – Digital Business Card`,
           url: `https://keepcard.com/${cardData.customUrl}`,
         })
-      } catch (err) {
-        console.log("Error sharing:", err)
+      } catch {
         handleCopyLink()
       }
     } else {
@@ -113,136 +129,104 @@ const DashboardPage = () => {
     }
   }
 
-  // Array de butoane pentru dashboard
   const dashboardButtons = [
-    {
-      label: "Copy Link",
-      onClick: handleCopyLink,
-      icon: (
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-          />
-        </svg>
-      ),
-    },
-    {
-      label: "Generate QR Code",
-      onClick: handleGenerateQR,
-      icon: (
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
-          />
-        </svg>
-      ),
-    },
+    { label: "Copy Link", onClick: handleCopyLink, icon: /* …SVG… */ null },
+    { label: "Generate QR Code", onClick: handleGenerateQR, icon: /* …SVG… */ null },
     {
       label: "Share Card",
       onClick: handleShareCard,
-      icon: (
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
-          />
-        </svg>
-      ),
+      icon: /* …SVG… */ null,
       extraClasses:
-        "bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white hover:from-fuchsia-600 hover:to-violet-700 hover:shadow-lg border-0",
+        "bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white hover:from-fuchsia-600 hover:to-violet-700",
     },
   ]
+
+  // 5️⃣ save changes: actualizează Firestore
+  const handleSave = async () => {
+    setIsSaved(true)
+    try {
+      await updateUserProfile(userUid, {
+        ...cardData,
+        badges: selectedBadges, // Add badges back for saving
+        visualTemplate: cardData.template, // Ensure template is saved correctly
+      })
+    } catch (err) {
+      console.error(err)
+      alert(err.message)
+    } finally {
+      setTimeout(() => setIsSaved(false), 2000)
+    }
+  }
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
       <Navbar
         isDarkMode={isDarkMode}
         setIsDarkMode={setIsDarkMode}
-        showLogout={true}
-        showProfileLink={true}
+        showLogout
+        showProfileLink
         showShare={false}
         showGetStarted={false}
-        cardData={{
-          name: "Teodora",
-          customUrl: "teodora-profile",
-        }}
+        cardData={{ name: cardData.fullName, customUrl: cardData.customUrl }}
       />
 
       {/* Sticky Save Button */}
       <div className="sticky top-0 z-10 bg-gradient-to-r from-fuchsia-500 to-violet-600 shadow-lg">
-        <div className="container mx-auto px-6 py-3">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-white">Edit Your Card</h1>
-            <SaveChanges onClick={handleSave} isSaved={isSaved} />
-          </div>
+        <div className="container mx-auto px-6 py-3 flex justify-between items-center">
+          <h1 className="text-white text-2xl font-bold">Edit Your Card</h1>
+          <SaveChanges onClick={handleSave} isSaved={isSaved} />
         </div>
       </div>
 
-      <div className="container mx-auto px-6 py-8">
-        <div className="grid lg:grid-cols-2 gap-12">
-          {/* Left Panel - Editor */}
-          <div className="space-y-8">
-            {/* Custom URL */}
-            <CustomUrl
-              customUrl={cardData.customUrl}
-              onUrlChange={(newUrl) => setCardData({ ...cardData, customUrl: newUrl })}
+      <div className="container mx-auto px-6 py-8 grid lg:grid-cols-2 gap-12">
+        {/* Left Panel */}
+        <div className="space-y-8">
+          <CustomUrl
+            customUrl={cardData.customUrl}
+            onUrlChange={(u) => setCardData((c) => ({ ...c, customUrl: u }))}
+            isDarkMode={isDarkMode}
+          />
+
+          <BadgeSelector
+            selectedBadges={selectedBadges}
+            onBadgeToggle={toggleBadge}
+            isDarkMode={isDarkMode}
+            maxBadges={2}
+          />
+
+          <div
+            className={`rounded-2xl p-6 shadow-lg border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}
+          >
+            <h2 className={`mb-4 text-xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"}`}>Profile Photo</h2>
+            <ProfilePhoto
+              profileImage={cardData.profileImage}
+              template={cardData.template}
               isDarkMode={isDarkMode}
+              size="w-20 h-20"
+              showUploadButton
+              onUploadClick={() => alert("Upload functionality will be added later!")}
             />
-
-            {/* Professional Badges */}
-            <BadgeSelector
-              selectedBadges={selectedBadges}
-              onBadgeToggle={toggleBadge}
-              isDarkMode={isDarkMode}
-              maxBadges={2}
-            />
-
-            {/* Profile Photo */}
-            <div
-              className={`${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-2xl p-6 shadow-lg border`}
-            >
-              <h2 className={`text-xl font-bold mb-4 ${isDarkMode ? "text-white" : "text-gray-900"}`}>Profile Photo</h2>
-
-              <ProfilePhoto
-                profileImage={cardData.profileImage}
-                template={cardData.template}
-                isDarkMode={isDarkMode}
-                size="w-20 h-20"
-                showUploadButton={true}
-                onUploadClick={() => {
-                  // Placeholder pentru viitoarea funcționalitate
-                  alert("Upload functionality will be added later!")
-                }}
-              />
-            </div>
-
-            <UserDetailsForm cardData={cardData} handleInputChange={handleInputChange} isDarkMode={isDarkMode} />
-
-            {/* Visual Template  */}
-            <div
-              className={`${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-2xl p-8 shadow-lg border transition-all duration-300 hover:shadow-xl`}
-            >
-              <h3
-                className={`text-xl font-bold mb-6 ${isDarkMode ? "text-white" : "text-gray-900"} transition-colors duration-300`}
-              >
-                Visual Template
-              </h3>
-              <VisualTemplate
-                templates={templates}
-                selectedTemplate={cardData.template}
-                onSelectTemplate={handleTemplateSelect}
-                isDarkMode={isDarkMode}
-              />
-            </div>
           </div>
+
+          <UserDetailsForm cardData={cardData} handleInputChange={handleInputChange} isDarkMode={isDarkMode} />
+
+          <div
+            className={`rounded-2xl p-8 shadow-lg border transition-all duration-300 hover:shadow-xl ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}
+          >
+            <h3 className={`mb-6 text-xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"}`}>Visual Template</h3>
+            <VisualTemplate
+              templates={[
+                { name: "Light", color: "bg-white border-2 border-purple-300" },
+                { name: "Dark", color: "bg-slate-900" },
+                { name: "Corporate", color: "bg-blue-600" },
+                { name: "Creative", color: "bg-gradient-to-r from-pink-500 to-purple-600" },
+              ]}
+              selectedTemplate={cardData.template}
+              onSelectTemplate={handleTemplateSelect}
+              isDarkMode={isDarkMode}
+            />
+          </div>
+        </div>
 
           {/* Right Panel - Live Preview */}
           <div className="lg:sticky lg:top-24 lg:h-fit">
@@ -286,20 +270,31 @@ const DashboardPage = () => {
               {/* Business Card Preview using BusinessCard component */}
               <div className="flex justify-center mb-8">
                 <div className="w-full max-w-[400px]" style={{ minWidth: "336px" }}>
-                  <BusinessCard
-                    cardData={cardData}
-                    selectedBadges={selectedBadges}
-                    isDarkMode={isDarkMode}
-                    showProfilePhoto={true}
-                    isClickable={false}
-                    variant="default"
-                  />
+   <BusinessCard
+       cardData={{
+       name:     cardData.fullName,   // înlocuiește proprietatea „name”
+       title:    cardData.jobTitle,   // mapăm jobTitle → title
+       location: cardData.location,
+       bio:      cardData.bio,
+       email:    cardData.email,
+       phone:    cardData.phone,
+       website:  cardData.website,
+       linkedin: cardData.linkedin,
+       github:   cardData.github,
+       template: cardData.template,
+       profileImage: cardData.profileImage,
+     }}
+     selectedBadges={selectedBadges}
+     isDarkMode={isDarkMode}
+     showProfilePhoto
+     isClickable={false}
+     variant="default"
+   />
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <ActionButtons buttons={dashboardButtons} isDarkMode={isDarkMode} />
-            </div>
+            {/* Action Buttons */}
+            <ActionButtons buttons={dashboardButtons} isDarkMode={isDarkMode} />
           </div>
         </div>
       </div>

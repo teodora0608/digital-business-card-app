@@ -1,27 +1,29 @@
-import { auth } from "./firebase-config.js";
+import { auth, db }                        from "./firebase-config.js";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signOut,
-  sendPasswordResetEmail,
+  signOut
 } from "firebase/auth";
+import { doc, setDoc }                     from "firebase/firestore";
 
-// Înregistrare cu email și parolă
-export const registerUser = (email, password) => {
-  return createUserWithEmailAndPassword(auth, email, password);
+// Înregistrare cu email, parolă și nume → Auth + Firestore
+export const registerUser = async (email, password, name) => {
+  // 1. Creezi user în Firebase Auth
+  const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+  const uid            = userCredential.user.uid;
+
+  // 2. Creezi documentul minimal în Firestore
+  await setDoc(doc(db, "users", uid), {
+    uid,
+    fullName: name || "",
+    email
+  });
+
+  return userCredential;
 };
 
-// Login cu email și parolă
-export const loginUser = (email, password) => {
-  return signInWithEmailAndPassword(auth, email, password);
-};
+export const loginUser = (email, password) =>
+  signInWithEmailAndPassword(auth, email, password);
 
-// Resetare parolă
-export const resetPassword = (email) => {
-  return sendPasswordResetEmail(auth, email);
-};
-
-// Logout
-export const logoutUser = () => {
-  return signOut(auth);
-};
+export const logoutUser = () =>
+  signOut(auth);

@@ -1,45 +1,59 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import FormGroup from "../common/form-group";
-import PasswordField from "../common/password-field";  // reusable, cu eye-toggle
-import { registerUser } from "../api/auth.js";
+import PasswordField from "../common/password-field";
+import { registerUser } from "../api/auth"; // acum include și creare profil Firestore
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
-    name: "", email: "", password: "", confirmPassword: ""
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
   const navigate = useNavigate();
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords don't match!");
       return;
     }
+
     try {
-      await registerUser(formData.email, formData.password);
-      // aici poți salva name și restul în Firestore, dacă vrei
+      // apel unificat: Auth + Firestore (profil default)
+      await registerUser(
+        formData.email,
+        formData.password,
+        formData.name
+      );
+
+      // după succes, merg la dashboard
       navigate("/dashboard");
     } catch (err) {
       console.error(err);
-      // mesaje prietenoase:
-      if (err.code === "auth/email-already-in-use")
+      if (err.code === "auth/email-already-in-use") {
         alert("This email is already registered.");
-      else alert(err.message);
+      } else {
+        alert(err.message);
+      }
     }
   };
 
-  const handleInputChange = e => {
+  const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
-      <Link to="/" className="absolute top-6 left-6 text-gray-400 hover:text-white">
+      <Link
+        to="/"
+        className="absolute top-6 left-6 text-gray-400 hover:text-white"
+      >
         ← Back to Home
       </Link>
       <div className="w-full max-w-md">
-        {/* Titlu + descriere */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
           <p className="text-gray-400">
@@ -47,7 +61,6 @@ const RegisterPage = () => {
           </p>
         </div>
 
-        {/* Formular */}
         <div className="bg-slate-800 rounded-2xl p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <FormGroup
@@ -69,7 +82,6 @@ const RegisterPage = () => {
               required
             />
 
-            {/* PasswordField tău cu eye-toggle */}
             <PasswordField
               label="Password"
               name="password"

@@ -1,10 +1,16 @@
+import React from "react";
+
 const UserDetailsForm = ({ cardData, handleInputChange, isDarkMode }) => {
   return (
     <div
-      className={`${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-2xl p-8 shadow-lg border transition-all duration-300 hover:shadow-xl`}
+      className={`${
+        isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
+      } rounded-2xl p-8 shadow-lg border transition-all duration-300 hover:shadow-xl`}
     >
       <h3
-        className={`text-xl font-bold mb-6 ${isDarkMode ? "text-white" : "text-gray-900"} transition-colors duration-300`}
+        className={`text-xl font-bold mb-6 ${
+          isDarkMode ? "text-white" : "text-gray-900"
+        } transition-colors duration-300`}
       >
         Personal Information
       </h3>
@@ -14,16 +20,18 @@ const UserDetailsForm = ({ cardData, handleInputChange, isDarkMode }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label
-              htmlFor="name"
-              className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"} transition-colors duration-300`}
+              htmlFor="fullName"
+              className={`block text-sm font-medium mb-2 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              } transition-colors duration-300`}
             >
               Full Name
             </label>
             <input
               type="text"
-              id="name"
-              name="name"
-              value={cardData.name}
+              id="fullName"
+              name="fullName"
+              value={cardData.fullName}
               onChange={handleInputChange}
               className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 ${
                 isDarkMode
@@ -35,16 +43,18 @@ const UserDetailsForm = ({ cardData, handleInputChange, isDarkMode }) => {
           </div>
           <div>
             <label
-              htmlFor="title"
-              className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"} transition-colors duration-300`}
+              htmlFor="jobTitle"
+              className={`block text-sm font-medium mb-2 ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              } transition-colors duration-300`}
             >
               Job Title
             </label>
             <input
               type="text"
-              id="title"
-              name="title"
-              value={cardData.title}
+              id="jobTitle"
+              name="jobTitle"
+              value={cardData.jobTitle}
               onChange={handleInputChange}
               className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 ${
                 isDarkMode
@@ -60,7 +70,9 @@ const UserDetailsForm = ({ cardData, handleInputChange, isDarkMode }) => {
         <div>
           <label
             htmlFor="location"
-            className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"} transition-colors duration-300`}
+            className={`block text-sm font-medium mb-2 ${
+              isDarkMode ? "text-gray-300" : "text-gray-700"
+            } transition-colors duration-300`}
           >
             Location
           </label>
@@ -83,7 +95,9 @@ const UserDetailsForm = ({ cardData, handleInputChange, isDarkMode }) => {
         <div>
           <label
             htmlFor="bio"
-            className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"} transition-colors duration-300`}
+            className={`block text-sm font-medium mb-2 ${
+              isDarkMode ? "text-gray-300" : "text-gray-700"
+            } transition-colors duration-300`}
           >
             Bio
           </label>
@@ -104,7 +118,11 @@ const UserDetailsForm = ({ cardData, handleInputChange, isDarkMode }) => {
 
         {/* Contact Information */}
         <div className="border-t pt-6 mt-6 border-gray-200 dark:border-gray-600">
-          <h4 className={`text-lg font-semibold mb-4 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+          <h4
+            className={`text-lg font-semibold mb-4 ${
+              isDarkMode ? "text-white" : "text-gray-900"
+            }`}
+          >
             Contact Information
           </h4>
 
@@ -112,7 +130,9 @@ const UserDetailsForm = ({ cardData, handleInputChange, isDarkMode }) => {
             <div>
               <label
                 htmlFor="email"
-                className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"} transition-colors duration-300`}
+                className={`block text-sm font-medium mb-2 ${
+                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                } transition-colors duration-300`}
               >
                 Email
               </label>
@@ -133,7 +153,9 @@ const UserDetailsForm = ({ cardData, handleInputChange, isDarkMode }) => {
             <div>
               <label
                 htmlFor="phone"
-                className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"} transition-colors duration-300`}
+                className={`block text-sm font-medium mb-2 ${
+                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                } transition-colors duration-300`}
               >
                 Phone
               </label>
@@ -156,13 +178,21 @@ const UserDetailsForm = ({ cardData, handleInputChange, isDarkMode }) => {
 
         {/* Social Links */}
         <div className="border-t pt-6 mt-6 border-gray-200 dark:border-gray-600">
-          <h4 className={`text-lg font-semibold mb-4 ${isDarkMode ? "text-white" : "text-gray-900"}`}>Social Links</h4>
+          <h4
+            className={`text-lg font-semibold mb-4 ${
+              isDarkMode ? "text-white" : "text-gray-900"
+            }`}
+          >
+            Social Links
+          </h4>
 
           <div className="space-y-4">
             <div>
               <label
                 htmlFor="website"
-                className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"} transition-colors duration-300`}
+                className={`block text-sm font-medium mb-2 ${
+                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                } transition-colors duration-300`}
               >
                 Website
               </label>
@@ -185,7 +215,9 @@ const UserDetailsForm = ({ cardData, handleInputChange, isDarkMode }) => {
               <div>
                 <label
                   htmlFor="linkedin"
-                  className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"} transition-colors duration-300`}
+                  className={`block text-sm font-medium mb-2 ${
+                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                  } transition-colors duration-300`}
                 >
                   LinkedIn
                 </label>
@@ -193,7 +225,7 @@ const UserDetailsForm = ({ cardData, handleInputChange, isDarkMode }) => {
                   type="text"
                   id="linkedin"
                   name="linkedin"
-                  value={cardData.linkedin}
+                  value={cardData.linkedin}  
                   onChange={handleInputChange}
                   className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 ${
                     isDarkMode
@@ -206,7 +238,9 @@ const UserDetailsForm = ({ cardData, handleInputChange, isDarkMode }) => {
               <div>
                 <label
                   htmlFor="github"
-                  className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"} transition-colors duration-300`}
+                  className={`block text-sm font-medium mb-2 ${
+                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                  } transition-colors duration-300`}
                 >
                   GitHub
                 </label>
@@ -229,7 +263,7 @@ const UserDetailsForm = ({ cardData, handleInputChange, isDarkMode }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default UserDetailsForm
+export default UserDetailsForm;

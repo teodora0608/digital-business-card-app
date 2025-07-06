@@ -1,5 +1,3 @@
-"use client"
-
 import ProfilePhoto from "../common/profile-picture"
 import BadgeDisplay from "../components/badge-display"
 
