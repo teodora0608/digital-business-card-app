@@ -1,4 +1,6 @@
-import { Link } from "react-router-dom"
+// src/common/navbar.jsx
+import { Link, useNavigate } from "react-router-dom";
+import { logoutUser } from "../api/auth.js"; // ajustează path-ul dacă e cazul
 
 const Navbar = ({
   isDarkMode = false,
@@ -9,20 +11,26 @@ const Navbar = ({
   showGetStarted = false,
   cardData = null,
 }) => {
-  const handleLogout = () => {
-    // Add logout logic here
-    console.log("Logout clicked")
-  }
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+      console.log("Logout successful");
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   const handleShare = () => {
-    // Add share logic here
-    console.log("Share clicked")
-  }
+    console.log("Share clicked");
+  };
 
   const getInitials = (name) => {
-    if (!name) return "U"
-    return name.charAt(0).toUpperCase()
-  }
+    if (!name) return "U";
+    return name.charAt(0).toUpperCase();
+  };
 
   return (
     <header
@@ -124,14 +132,28 @@ const Navbar = ({
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 }`}
               >
-                <div className="w-8 h-8 bg-gradient-to-r from-fuchsia-600 to-violet-600 rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">{getInitials(cardData.name)}</span>
-                </div>
+                {/*
+                  În locul cercului cu inițiala, afișăm poza dacă există,
+                  altfel fallback-ul cu inițiala, fără să schimbăm nicio clasă
+                */}
+                {cardData.profileImage?.trim() ? (
+                  <div
+                    className="w-8 h-8 rounded-full bg-cover bg-center"
+                    style={{ backgroundImage: `url(${cardData.profileImage})` }}
+                  />
+                ) : (
+                  <div className="w-8 h-8 bg-gradient-to-r from-fuchsia-600 to-violet-600 rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">
+                      {getInitials(cardData.name)}
+                    </span>
+                  </div>
+                )}
                 <span className="font-medium">{cardData.name}</span>
               </Link>
             )}
 
             {/* Logout Button */}
+            {showLogout && (
               <button
                 onClick={handleLogout}
                 className={`p-2 rounded-lg transition-all duration-200 ${
@@ -149,11 +171,12 @@ const Navbar = ({
                   />
                 </svg>
               </button>
+            )}
           </div>
         </div>
       </div>
     </header>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

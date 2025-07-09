@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import Navbar from "../common/navbar";
@@ -41,6 +43,7 @@ const ProfilePage = () => {
             customUrl: userData.customUrl,
             template: userData.template || "creative",
             badges: userData.badges || [],
+            profileImage: userData.profileImage || "", // ✅ ADĂUGAT!
           });
         }
       } catch (err) {
@@ -274,7 +277,6 @@ END:VCARD`;
             />
           </div>
 
-          {/* Call to Action adăugat la loc */}
           <div
             className={`text-center rounded-2xl p-8 shadow-lg border ${
               isDarkMode

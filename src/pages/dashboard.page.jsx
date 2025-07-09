@@ -160,16 +160,19 @@ const DashboardPage = () => {
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
-      <Navbar
-        isDarkMode={isDarkMode}
-        setIsDarkMode={setIsDarkMode}
-        showLogout
-        showProfileLink
-        showShare={false}
-        showGetStarted={false}
-        cardData={{ name: cardData.fullName, customUrl: cardData.customUrl }}
-      />
-
+<Navbar
+  isDarkMode={isDarkMode}
+  setIsDarkMode={setIsDarkMode}
+  showLogout
+  showProfileLink
+  showShare={false}
+  showGetStarted={false}
+  cardData={{
+    name: cardData.fullName,
+    customUrl: cardData.customUrl,
+    profileImage: cardData.profileImage  // ← aici
+  }}
+/>
       {/* Sticky Save Button */}
       <div className="sticky top-0 z-10 bg-gradient-to-r from-fuchsia-500 to-violet-600 shadow-lg">
         <div className="container mx-auto px-6 py-3 flex justify-between items-center">
@@ -198,14 +201,18 @@ const DashboardPage = () => {
             className={`rounded-2xl p-6 shadow-lg border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}
           >
             <h2 className={`mb-4 text-xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"}`}>Profile Photo</h2>
-            <ProfilePhoto
-              profileImage={cardData.profileImage}
-              template={cardData.template}
-              isDarkMode={isDarkMode}
-              size="w-20 h-20"
-              showUploadButton
-              onUploadClick={() => alert("Upload functionality will be added later!")}
-            />
+<ProfilePhoto
+  profileImage={cardData.profileImage}
+  template={cardData.template}
+  isDarkMode={isDarkMode}
+  size="w-20 h-20"
+  showUploadButton
+  onImageChange={(base64) => {
+    console.log("Imagine Base64:", base64);
+    setCardData((c) => ({ ...c, profileImage: base64 }));
+  }}
+  name={cardData.fullName}
+/>
           </div>
 
           <UserDetailsForm cardData={cardData} handleInputChange={handleInputChange} isDarkMode={isDarkMode} />
@@ -303,3 +310,4 @@ const DashboardPage = () => {
 }
 
 export default DashboardPage
+ 

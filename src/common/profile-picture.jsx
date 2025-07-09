@@ -1,4 +1,6 @@
-"use client"
+"use client";
+
+import { useRef, useEffect } from "react";
 
 const ProfilePhoto = ({
   profileImage = null,
@@ -6,58 +8,81 @@ const ProfilePhoto = ({
   isDarkMode = false,
   size = "w-20 h-20",
   showUploadButton = true,
-  onUploadClick = () => {},
-  name = "User", // Adaugă prop pentru nume
+  onImageChange = () => {},
+  name = "User",
 }) => {
-  // Get gradient based on template
+  const fileInputRef = useRef(null);
+
+  const handleUploadClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = (e) => {
+    const myFile = e.target.files[0];
+    if (myFile) {
+      const fr = new FileReader();
+      fr.addEventListener("load", () => {
+        const imageURL = fr.result;
+        onImageChange(imageURL);
+        localStorage.setItem("profileImage", imageURL);
+      });
+      fr.readAsDataURL(myFile);
+    }
+  };
+
+  useEffect(() => {
+    const storedImage = localStorage.getItem("profileImage");
+    if (storedImage && !profileImage) {
+      onImageChange(storedImage);
+    }
+  }, []);
+
   const getGradient = () => {
     switch (template) {
       case "light":
-        return "bg-gradient-to-r from-fuchsia-500 to-violet-600"
+        return "bg-gradient-to-r from-fuchsia-500 to-violet-600";
       case "dark":
-        return "bg-white"
+        return "bg-white";
       case "corporate":
-        return "bg-white"
+        return "bg-white";
       case "creative":
       default:
-        return "bg-white" // Changed from gradient to white for creative template
+        return "bg-white";
     }
-  }
+  };
 
-  // Get text color for the first letter
   const getTextColor = () => {
     switch (template) {
       case "light":
-        return "text-white"
+        return "text-white";
       case "dark":
-        return "text-fuchsia-600"
+        return "text-fuchsia-600";
       case "corporate":
-        return "text-blue-600"
+        return "text-blue-600";
       case "creative":
       default:
-        return "text-fuchsia-600" // Changed from white to fuchsia for better contrast on white background
+        return "text-fuchsia-600";
     }
-  }
+  };
 
-  // Get first letter from name
   const getFirstLetter = () => {
-    if (!name || name.trim() === "") return "U"
-    return name.trim().charAt(0).toUpperCase()
-  }
+    if (!name || name.trim() === "") return "U";
+    return name.trim().charAt(0).toUpperCase();
+  };
 
   return (
     <div className="flex flex-col items-center space-y-4">
-      {/* Profile Photo Circle */}
       <div
         className={`
-          ${size} 
-          rounded-full 
-          flex 
-          items-center 
-          justify-center 
-          flex-shrink-0 
-          transition-all 
+          ${size}
+          rounded-full
+          flex
+          items-center
+          justify-center
+          flex-shrink-0
+          transition-all
           duration-300
+          overflow-hidden
           ${!profileImage ? getGradient() : ""}
         `}
         style={
@@ -70,13 +95,24 @@ const ProfilePhoto = ({
             : {}
         }
       >
-        {!profileImage && <span className={`${getTextColor()} font-bold text-2xl`}>{getFirstLetter()}</span>}
+        {!profileImage && (
+          <span className={`${getTextColor()} font-bold text-2xl`}>
+            {getFirstLetter()}
+          </span>
+        )}
       </div>
 
-      {/* Upload Button */}
+      <input
+        type="file"
+        accept="image/*"
+        ref={fileInputRef}
+        className="hidden"
+        onChange={handleFileChange}
+      />
+
       {showUploadButton && (
         <button
-          onClick={onUploadClick}
+          onClick={handleUploadClick}
           className={`
             flex items-center px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105
             ${
@@ -86,20 +122,31 @@ const ProfilePhoto = ({
             }
           `}
         >
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="w-4 h-4 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={2}
               d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
             />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+            />
           </svg>
           Upload Photo
         </button>
+        
       )}
     </div>
-  )
-}
+  );
+};
 
-export default ProfilePhoto 
+export default ProfilePhoto;
