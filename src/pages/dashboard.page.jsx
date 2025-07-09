@@ -18,6 +18,7 @@ import SaveChanges from "../common/save-changes"
 const DashboardPage = () => {
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
   const [userUid, setUserUid] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -28,13 +29,12 @@ const DashboardPage = () => {
         setUserUid(user.uid)
       } else {
         setUserUid(null)
-        // dacă nu e logat: eventual redirect la /login
       }
     })
     return () => unsub()
   }, [])
 
-// 2️⃣ datele profilului: ținem doar fullName + email ca fallback
+  // 2️⃣ datele profilului: ținem și profileImage ca Base64
   const [cardData, setCardData] = useState({
     fullName: "",
     email: "",
@@ -46,7 +46,7 @@ const DashboardPage = () => {
     linkedin: "",
     github: "",
     customUrl: "",
-    template: "creative", // Default template
+    template: "creative",
     profileImage: "",
   })
   const [selectedBadges, setSelectedBadges] = useState([])
@@ -58,7 +58,6 @@ const DashboardPage = () => {
       try {
         const data = await getUserProfile(userUid)
         if (data) {
-          // Separate badges from the rest of the card data
           const { badges, ...details } = data
           setCardData({
             fullName: details.fullName || "",
@@ -88,31 +87,30 @@ const DashboardPage = () => {
 
   if (loading) return <div>Loading profile…</div>
 
-  // 4️⃣ handlers UI (neschimbate)
-  const handleInputChange = (e) => setCardData((c) => ({ ...c, [e.target.name]: e.target.value }))
+  // 4️⃣ handlers UI
+  const handleInputChange = (e) =>
+    setCardData((c) => ({ ...c, [e.target.name]: e.target.value }))
 
-  const toggleBadge = (badge) => {
-    setSelectedBadges((prevBadges) => {
-      const hasBadge = prevBadges.includes(badge)
-      if (hasBadge) {
-        return prevBadges.filter((b) => b !== badge)
-      }
-      if (prevBadges.length < 2) {
-        return [...prevBadges, badge]
-      }
-      return prevBadges
+  const toggleBadge = (badge) =>
+    setSelectedBadges((prev) => {
+      if (prev.includes(badge)) return prev.filter((b) => b !== badge)
+      if (prev.length < 2) return [...prev, badge]
+      return prev
     })
-  }
 
-  const handleTemplateSelect = (templateName) => setCardData((c) => ({ ...c, template: templateName }))
+  const handleTemplateSelect = (templateName) =>
+    setCardData((c) => ({ ...c, template: templateName }))
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(`https://keepcard.com/${cardData.customUrl}`)
+      await navigator.clipboard.writeText(
+        `https://keepcard.com/${cardData.customUrl}`
+      )
     } catch {}
   }
 
-  const handleGenerateQR = () => alert("QR Code generation will be implemented later!")
+  const handleGenerateQR = () =>
+    alert("QR Code generation will be implemented later!")
 
   const handleShareCard = async () => {
     if (navigator.share) {
@@ -130,54 +128,65 @@ const DashboardPage = () => {
   }
 
   const dashboardButtons = [
-    { label: "Copy Link", onClick: handleCopyLink, icon: /* …SVG… */ null },
-    { label: "Generate QR Code", onClick: handleGenerateQR, icon: /* …SVG… */ null },
+    { label: "Copy Link", onClick: handleCopyLink, icon: null },
+    { label: "Generate QR Code", onClick: handleGenerateQR, icon: null },
     {
       label: "Share Card",
       onClick: handleShareCard,
-      icon: /* …SVG… */ null,
+      icon: null,
       extraClasses:
         "bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white hover:from-fuchsia-600 hover:to-violet-700",
     },
   ]
 
-  // 5️⃣ save changes: actualizează Firestore
+  // 5️⃣ save changes cu loading state
   const handleSave = async () => {
-    setIsSaved(true)
+    setIsSaving(true)
     try {
       await updateUserProfile(userUid, {
         ...cardData,
-        badges: selectedBadges, // Add badges back for saving
-        visualTemplate: cardData.template, // Ensure template is saved correctly
+        badges: selectedBadges,
+        visualTemplate: cardData.template,
       })
     } catch (err) {
       console.error(err)
       alert(err.message)
     } finally {
+      setIsSaving(false)
+      setIsSaved(true)
       setTimeout(() => setIsSaved(false), 2000)
     }
   }
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
-<Navbar
-  isDarkMode={isDarkMode}
-  setIsDarkMode={setIsDarkMode}
-  showLogout
-  showProfileLink
-  showShare={false}
-  showGetStarted={false}
-  cardData={{
-    name: cardData.fullName,
-    customUrl: cardData.customUrl,
-    profileImage: cardData.profileImage  // ← aici
-  }}
-/>
+    <div
+      className={`min-h-screen transition-colors duration-300 ${
+        isDarkMode ? "bg-gray-900" : "bg-gray-50"
+      }`}
+    >
+      <Navbar
+        isDarkMode={isDarkMode}
+        setIsDarkMode={setIsDarkMode}
+        showLogout
+        showProfileLink
+        showShare={false}
+        showGetStarted={false}
+        cardData={{
+          name: cardData.fullName,
+          customUrl: cardData.customUrl,
+          profileImage: cardData.profileImage,
+        }}
+      />
+
       {/* Sticky Save Button */}
       <div className="sticky top-0 z-10 bg-gradient-to-r from-fuchsia-500 to-violet-600 shadow-lg">
         <div className="container mx-auto px-6 py-3 flex justify-between items-center">
           <h1 className="text-white text-2xl font-bold">Edit Your Card</h1>
-          <SaveChanges onClick={handleSave} isSaved={isSaved} />
+          <SaveChanges
+            onClick={handleSave}
+            isSaved={isSaved}
+            isLoading={isSaving}
+          />
         </div>
       </div>
 
@@ -186,7 +195,9 @@ const DashboardPage = () => {
         <div className="space-y-8">
           <CustomUrl
             customUrl={cardData.customUrl}
-            onUrlChange={(u) => setCardData((c) => ({ ...c, customUrl: u }))}
+            onUrlChange={(u) =>
+              setCardData((c) => ({ ...c, customUrl: u }))
+            }
             isDarkMode={isDarkMode}
           />
 
@@ -198,29 +209,48 @@ const DashboardPage = () => {
           />
 
           <div
-            className={`rounded-2xl p-6 shadow-lg border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}
+            className={`rounded-2xl p-6 shadow-lg border ${
+              isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
+            }`}
           >
-            <h2 className={`mb-4 text-xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"}`}>Profile Photo</h2>
-<ProfilePhoto
-  profileImage={cardData.profileImage}
-  template={cardData.template}
-  isDarkMode={isDarkMode}
-  size="w-20 h-20"
-  showUploadButton
-  onImageChange={(base64) => {
-    console.log("Imagine Base64:", base64);
-    setCardData((c) => ({ ...c, profileImage: base64 }));
-  }}
-  name={cardData.fullName}
-/>
+            <h2
+              className={`mb-4 text-xl font-bold ${
+                isDarkMode ? "text-white" : "text-gray-900"
+              }`}
+            >
+              Profile Photo
+            </h2>
+            <ProfilePhoto
+              profileImage={cardData.profileImage}
+              template={cardData.template}
+              isDarkMode={isDarkMode}
+              size="w-20 h-20"
+              showUploadButton
+              onImageChange={(base64) =>
+                setCardData((c) => ({ ...c, profileImage: base64 }))
+              }
+              name={cardData.fullName}
+            />
           </div>
 
-          <UserDetailsForm cardData={cardData} handleInputChange={handleInputChange} isDarkMode={isDarkMode} />
+          <UserDetailsForm
+            cardData={cardData}
+            handleInputChange={handleInputChange}
+            isDarkMode={isDarkMode}
+          />
 
           <div
-            className={`rounded-2xl p-8 shadow-lg border transition-all duration-300 hover:shadow-xl ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}
+            className={`rounded-2xl p-8 shadow-lg border transition-all duration-300 hover:shadow-xl ${
+              isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
+            }`}
           >
-            <h3 className={`mb-6 text-xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"}`}>Visual Template</h3>
+            <h3
+              className={`mb-6 text-xl font-bold ${
+                isDarkMode ? "text-white" : "text-gray-900"
+              }`}
+            >
+              Visual Template
+            </h3>
             <VisualTemplate
               templates={[
                 { name: "Light", color: "bg-white border-2 border-purple-300" },
@@ -235,70 +265,64 @@ const DashboardPage = () => {
           </div>
         </div>
 
-          {/* Right Panel - Live Preview */}
-          <div className="lg:sticky lg:top-24 lg:h-fit">
-            <div
-              className={`${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} rounded-2xl p-8 shadow-lg border transition-all duration-300 hover:shadow-xl`}
-            >
-              <div className="flex items-center justify-between mb-8">
-                <h2
-                  className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"} transition-colors duration-300`}
-                >
-                  Live Preview
-                </h2>
-                <div className="flex items-center space-x-2">
-                  <button
-                    className={`p-2 rounded-lg transition-all duration-200 ${isDarkMode ? "text-gray-400 hover:text-white hover:bg-gray-700" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"}`}
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    className={`p-2 rounded-lg transition-all duration-200 ${isDarkMode ? "text-gray-400 hover:text-white hover:bg-gray-700" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"}`}
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                      />
-                    </svg>
-                  </button>
-                </div>
+        {/* Right Panel - Live Preview */}
+        <div className="lg:sticky lg:top-24 lg:h-fit">
+          <div
+            className={`${
+              isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
+            } rounded-2xl p-8 shadow-lg border transition-all duration-300 hover:shadow-xl`}
+          >
+            <div className="flex items-center justify-between mb-8">
+              <h2
+                className={`text-xl font-bold ${
+                  isDarkMode ? "text-white" : "text-gray-900"
+                } transition-colors duration-300`}
+              >
+                Live Preview
+              </h2>
+              <div className="flex items-center space-x-2">
+                <button className={`p-2 rounded-lg transition-all duration-200 ${
+                    isDarkMode
+                      ? "text-gray-400 hover:text-white hover:bg-gray-700"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  }`}>
+                  {/* … */}
+                </button>
+                <button className={`p-2 rounded-lg transition-all duration-200 ${
+                    isDarkMode
+                      ? "text-gray-400 hover:text-white hover:bg-gray-700"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  }`}>
+                  {/* … */}
+                </button>
               </div>
+            </div>
 
-              {/* Business Card Preview using BusinessCard component */}
-              <div className="flex justify-center mb-8">
-                <div className="w-full max-w-[400px]" style={{ minWidth: "336px" }}>
-   <BusinessCard
-       cardData={{
-       name:     cardData.fullName,   // înlocuiește proprietatea „name”
-       title:    cardData.jobTitle,   // mapăm jobTitle → title
-       location: cardData.location,
-       bio:      cardData.bio,
-       email:    cardData.email,
-       phone:    cardData.phone,
-       website:  cardData.website,
-       linkedin: cardData.linkedin,
-       github:   cardData.github,
-       template: cardData.template,
-       profileImage: cardData.profileImage,
-     }}
-     selectedBadges={selectedBadges}
-     isDarkMode={isDarkMode}
-     showProfilePhoto
-     isClickable={false}
-     variant="default"
-   />
-                </div>
+            {/* Business Card Preview */}
+            <div className="flex justify-center mb-8">
+              <div className="w-full max-w-[400px]" style={{ minWidth: "336px" }}>
+                <BusinessCard
+                  cardData={{
+                    name: cardData.fullName,
+                    title: cardData.jobTitle,
+                    location: cardData.location,
+                    bio: cardData.bio,
+                    email: cardData.email,
+                    phone: cardData.phone,
+                    website: cardData.website,
+                    linkedin: cardData.linkedin,
+                    github: cardData.github,
+                    template: cardData.template,
+                    profileImage: cardData.profileImage,
+                  }}
+                  selectedBadges={selectedBadges}
+                  isDarkMode={isDarkMode}
+                  showProfilePhoto
+                  isClickable={false}
+                  variant="default"
+                />
               </div>
+            </div>
 
             {/* Action Buttons */}
             <ActionButtons buttons={dashboardButtons} isDarkMode={isDarkMode} />
@@ -310,4 +334,3 @@ const DashboardPage = () => {
 }
 
 export default DashboardPage
- 

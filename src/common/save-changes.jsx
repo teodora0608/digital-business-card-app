@@ -1,21 +1,63 @@
-const SaveChanges = ({ onClick, isSaved }) => {
+// src/common/save-changes.jsx
+import React from "react";
+
+const SaveChanges = ({ onClick, isSaved, isLoading }) => {
   return (
     <button
       onClick={onClick}
-      className={`flex items-center px-6 py-2 bg-white text-fuchsia-600 rounded-lg font-semibold transition-all duration-200 hover:bg-gray-100 hover:scale-105 ${
-        isSaved ? "bg-green-100 text-green-700" : ""
-      }`}
+      disabled={isLoading}
+      className={`flex items-center px-6 py-2 rounded-lg font-semibold transition-all duration-200
+        ${isLoading ? "opacity-50 cursor-not-allowed" : "hover:scale-105"}
+        ${isSaved ? "bg-green-100 text-green-700" : "bg-white text-fuchsia-600 hover:bg-gray-100"}
+      `}
     >
-      {isSaved ? (
+      {isLoading ? (
+        // Loading icon & text
         <>
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="animate-spin w-4 h-4 mr-2 text-fuchsia-600"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4l3-3-3-3v4a12 12 0 00-12 12h4z"
+            ></path>
+          </svg>
+          Saving…
+        </>
+      ) : isSaved ? (
+        // Saved icon & text
+        <>
+          <svg
+            className="w-4 h-4 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
           Saved!
         </>
       ) : (
+        // Default icon & text
         <>
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="w-4 h-4 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -27,7 +69,7 @@ const SaveChanges = ({ onClick, isSaved }) => {
         </>
       )}
     </button>
-  )
-}
+  );
+};
 
-export default SaveChanges
+export default SaveChanges;
