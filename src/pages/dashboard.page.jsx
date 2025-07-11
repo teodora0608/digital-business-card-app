@@ -38,11 +38,25 @@ const DashboardPage = () => {
     website: "",
     linkedin: "",
     github: "",
-    customUrl: "",    // start empty, default UID shown client-side
+    customUrl: "",
     template: "creative",
     profileImage: "",
   })
   const [selectedBadges, setSelectedBadges] = useState([])
+
+  // field-level validity
+  const [fieldsValid, setFieldsValid] = useState({
+    fullName: false,
+    jobTitle: false,
+    email: false,
+    website: true,
+    linkedin: true,
+    github: true,
+  })
+
+  // combined form validity
+  const isFormValid =
+    isUrlValid && Object.values(fieldsValid).every(Boolean)
 
   // 1️⃣ Subscribe to auth state
   useEffect(() => {
@@ -70,12 +84,29 @@ const DashboardPage = () => {
             website: details.website || "",
             linkedin: details.linkedin || "",
             github: details.github || "",
-            // keep blank if not set yet
             customUrl: details.customUrl || "",
             template: visualTemplate || "creative",
             profileImage: details.profileImage || "",
           })
           setSelectedBadges(badges || [])
+          setFieldsValid({
+            fullName: Boolean(details.fullName),
+            jobTitle: Boolean(details.jobTitle),
+            email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(details.email || ""),
+            website:
+              !details.website ||
+              /^https?:\/\/[^\s/$.?#].[^\s]*$/.test(details.website),
+            linkedin:
+              !details.linkedin ||
+              /^(https?:\/\/)?(www\.)?linkedin\.com\/.+$/.test(
+                details.linkedin
+              ),
+            github:
+              !details.github ||
+              /^(https?:\/\/)?(www\.)?github\.com\/.+$/.test(
+                details.github
+              ),
+          })
         }
       } catch (err) {
         console.error("Could not load profile:", err)
@@ -90,8 +121,35 @@ const DashboardPage = () => {
   if (loading) return <div>Loading profile…</div>
 
   // 3️⃣ Handlers for other fields
-  const handleInputChange = (e) =>
-    setCardData((c) => ({ ...c, [e.target.name]: e.target.value }))
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setCardData((c) => ({ ...c, [name]: value }))
+
+    let valid = true
+    if (["fullName", "jobTitle"].includes(name)) {
+      valid = value.trim() !== ""
+    }
+    if (name === "email") {
+      valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+    }
+    if (name === "website") {
+      valid =
+        !value ||
+        /^https?:\/\/[^\s/$.?#].[^\s]*$/.test(value)
+    }
+    if (name === "linkedin") {
+      valid =
+        !value ||
+        /^(https?:\/\/)?(www\.)?linkedin\.com\/.+$/.test(value)
+    }
+    if (name === "github") {
+      valid =
+        !value ||
+        /^(https?:\/\/)?(www\.)?github\.com\/.+$/.test(value)
+    }
+
+    setFieldsValid((f) => ({ ...f, [name]: valid }))
+  }
 
   const toggleBadge = (badge) =>
     setSelectedBadges((prev) => {
@@ -105,11 +163,10 @@ const DashboardPage = () => {
 
   // 4️⃣ Save handler with URL-validity guard & UID fallback
   const handleSave = async () => {
-    if (!isUrlValid) {
-      alert("Custom URL nu e disponibil, alege altul înainte de a salva.")
+    if (!isFormValid) {
+      alert("Please correct the errors before saving.")
       return
     }
-    // dacă user a șters slug-ul, folosește UID la salvare
     const finalSlug = cardData.customUrl || userUid
 
     setIsSaving(true)
@@ -120,20 +177,23 @@ const DashboardPage = () => {
         badges: selectedBadges,
         visualTemplate: cardData.template,
       })
-      // actualizează local pentru UI
       setCardData((c) => ({ ...c, customUrl: finalSlug }))
       setIsSaved(true)
       setTimeout(() => setIsSaved(false), 2000)
     } catch (err) {
       console.error(err)
-      alert(err.message || "Eroare la salvare")
+      alert(err.message || "Error saving profile")
     } finally {
       setIsSaving(false)
     }
   }
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
+    <div
+      className={`min-h-screen transition-colors duration-300 ${
+        isDarkMode ? "bg-gray-900" : "bg-gray-50"
+      }`}
+    >
       <Navbar
         isDarkMode={isDarkMode}
         setIsDarkMode={setIsDarkMode}
@@ -156,7 +216,7 @@ const DashboardPage = () => {
             onClick={handleSave}
             isSaved={isSaved}
             isLoading={isSaving}
-            disabled={!isUrlValid}
+            disabled={!isFormValid}
           />
         </div>
       </div>
@@ -166,7 +226,9 @@ const DashboardPage = () => {
         <div className="space-y-8">
           <CustomUrl
             customUrl={cardData.customUrl}
-            onUrlChange={(u) => setCardData((c) => ({ ...c, customUrl: u }))}
+            onUrlChange={(u) =>
+              setCardData((c) => ({ ...c, customUrl: u }))
+            }
             onValidityChange={setIsUrlValid}
             userUid={userUid}
             isDarkMode={isDarkMode}
@@ -179,8 +241,18 @@ const DashboardPage = () => {
             maxBadges={2}
           />
 
-          <div className={`rounded-2xl p-6 shadow-lg border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
-            <h2 className={`mb-4 text-xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+          <div
+            className={`rounded-2xl p-6 shadow-lg border ${
+              isDarkMode
+                ? "bg-gray-800 border-gray-700"
+                : "bg-white border-gray-200"
+            }`}
+          >
+            <h2
+              className={`mb-4 text-xl font-bold ${
+                isDarkMode ? "text-white" : "text-gray-900"
+              }`}
+            >
               Profile Photo
             </h2>
             <ProfilePhoto
@@ -200,10 +272,21 @@ const DashboardPage = () => {
             cardData={cardData}
             handleInputChange={handleInputChange}
             isDarkMode={isDarkMode}
+            fieldsValid={fieldsValid}
           />
 
-          <div className={`rounded-2xl p-8 shadow-lg border transition-all duration-300 hover:shadow-xl ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
-            <h3 className={`mb-6 text-xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+          <div
+            className={`rounded-2xl p-8 shadow-lg border transition-all duration-300 hover:shadow-xl ${
+              isDarkMode
+                ? "bg-gray-800 border-gray-700"
+                : "bg-white border-gray-200"
+            }`}
+          >
+            <h3
+              className={`mb-6 text-xl font-bold ${
+                isDarkMode ? "text-white" : "text-gray-900"
+              }`}
+            >
               Visual Template
             </h3>
             <VisualTemplate
@@ -211,7 +294,10 @@ const DashboardPage = () => {
                 { name: "Light", color: "bg-white border-2 border-purple-300" },
                 { name: "Dark", color: "bg-slate-900" },
                 { name: "Corporate", color: "bg-blue-600" },
-                { name: "Creative", color: "bg-gradient-to-r from-pink-500 to-purple-600" },
+                {
+                  name: "Creative",
+                  color: "bg-gradient-to-r from-pink-500 to-purple-600",
+                },
               ]}
               selectedTemplate={cardData.template}
               onSelectTemplate={handleTemplateSelect}
@@ -221,45 +307,45 @@ const DashboardPage = () => {
         </div>
 
         {/* Right Panel - Live Preview */}
-<div className="lg:sticky lg:top-24 lg:h-fit">
-  <div
-    className={`rounded-2xl p-8 shadow-lg border transition-all duration-300 hover:shadow-xl 
-      ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}
-  >
-    <div className="flex items-center justify-between mb-8">
-      <h2 className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"}`}>
-        Live Preview
-      </h2>
-      {/* butoanele de edit au fost eliminate */}
-    </div>
+        <div className="lg:sticky lg:top-24 lg:h-fit">
+          <div
+            className={`rounded-2xl p-8 shadow-lg border transition-all duration-300 hover:shadow-xl ${
+              isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
+            }`}
+          >
+            <div className="flex items-center justify-between mb-8">
+              <h2 className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+                Live Preview
+              </h2>
+            </div>
 
-    <div className="flex justify-center mb-8">
-      <div className="w-full max-w-[400px]" style={{ minWidth: "336px" }}>
-        <BusinessCard
-          cardData={{
-            name: cardData.fullName,
-            jobTitle: cardData.jobTitle,
-            location: cardData.location,
-            bio: cardData.bio,
-            email: cardData.email,
-            phone: cardData.phone,
-            website: cardData.website,
-            linkedin: cardData.linkedin,
-            github: cardData.github,
-            template: cardData.template,
-            profileImage: cardData.profileImage,
-            customUrl: cardData.customUrl || userUid,
-          }}
-          selectedBadges={selectedBadges}
-          isDarkMode={isDarkMode}
-          showProfilePhoto
-          isClickable={false}
-          variant="default"
-        />
-      </div>
-    </div>
-  </div>
-</div>
+            <div className="flex justify-center mb-8">
+              <div className="w-full max-w-[400px]" style={{ minWidth: "336px" }}>
+                <BusinessCard
+                  cardData={{
+                    name: cardData.fullName,
+                    jobTitle: cardData.jobTitle,
+                    location: cardData.location,
+                    bio: cardData.bio,
+                    email: cardData.email,
+                    phone: cardData.phone,
+                    website: cardData.website,
+                    linkedin: cardData.linkedin,
+                    github: cardData.github,
+                    template: cardData.template,
+                    profileImage: cardData.profileImage,
+                    customUrl: cardData.customUrl || userUid,
+                  }}
+                  selectedBadges={selectedBadges}
+                  isDarkMode={isDarkMode}
+                  showProfilePhoto
+                  isClickable={false}
+                  variant="default"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )
