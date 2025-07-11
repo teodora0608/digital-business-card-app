@@ -33,7 +33,7 @@ const ProfilePage = () => {
           setCardData({
             name: userData.fullName,
             email: userData.email,
-            title: userData.title || "",
+            jobTitle: userData.jobTitle || "",
             location: userData.location || "",
             bio: userData.bio || "",
             phone: userData.phone || "",
@@ -43,7 +43,7 @@ const ProfilePage = () => {
             customUrl: userData.customUrl,
             template: userData.template || "creative",
             badges: userData.badges || [],
-            profileImage: userData.profileImage || "", // ✅ ADĂUGAT!
+            profileImage: userData.profileImage || "",
           });
         }
       } catch (err) {
@@ -73,7 +73,7 @@ const ProfilePage = () => {
     const vCard = `BEGIN:VCARD
 VERSION:3.0
 FN:${cardData.name}
-TITLE:${cardData.title}
+TITLE:${cardData.jobTitle}
 EMAIL:${cardData.email}
 TEL:${cardData.phone}
 URL:${cardData.website}

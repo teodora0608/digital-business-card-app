@@ -74,7 +74,7 @@ const BusinessCard = ({
               textColor === "text-white" ? "text-white/90" : "text-gray-600"
             } ${variant === "standalone" ? "text-lg mb-3" : "text-base mb-2"} transition-all duration-300`}
           >
-            {cardData.title}
+             {cardData.jobTitle}
           </p>
           <div
             className={`flex items-center text-sm ${

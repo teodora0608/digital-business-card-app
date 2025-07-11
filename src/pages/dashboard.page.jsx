@@ -11,7 +11,6 @@ import CustomUrl from "../components/custom-url"
 import BadgeSelector from "../components/badge-selector"
 import ProfilePhoto from "../common/profile-picture"
 import BusinessCard from "../common/business-card"
-import ActionButtons from "../common/action-buttons"
 import VisualTemplate from "../common/visual-template"
 import SaveChanges from "../common/save-changes"
 
@@ -101,44 +100,6 @@ const DashboardPage = () => {
   const handleTemplateSelect = (templateName) =>
     setCardData((c) => ({ ...c, template: templateName }))
 
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(
-        `https://keepcard.com/${cardData.customUrl}`
-      )
-    } catch {}
-  }
-
-  const handleGenerateQR = () =>
-    alert("QR Code generation will be implemented later!")
-
-  const handleShareCard = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: `${cardData.fullName} – Digital Business Card`,
-          url: `https://keepcard.com/${cardData.customUrl}`,
-        })
-      } catch {
-        handleCopyLink()
-      }
-    } else {
-      handleCopyLink()
-    }
-  }
-
-  const dashboardButtons = [
-    { label: "Copy Link", onClick: handleCopyLink, icon: null },
-    { label: "Generate QR Code", onClick: handleGenerateQR, icon: null },
-    {
-      label: "Share Card",
-      onClick: handleShareCard,
-      icon: null,
-      extraClasses:
-        "bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white hover:from-fuchsia-600 hover:to-violet-700",
-    },
-  ]
-
   // 5️⃣ save changes cu loading state
   const handleSave = async () => {
     setIsSaving(true)
@@ -210,7 +171,9 @@ const DashboardPage = () => {
 
           <div
             className={`rounded-2xl p-6 shadow-lg border ${
-              isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
+              isDarkMode
+                ? "bg-gray-800 border-gray-700"
+                : "bg-white border-gray-200"
             }`}
           >
             <h2
@@ -241,7 +204,9 @@ const DashboardPage = () => {
 
           <div
             className={`rounded-2xl p-8 shadow-lg border transition-all duration-300 hover:shadow-xl ${
-              isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
+              isDarkMode
+                ? "bg-gray-800 border-gray-700"
+                : "bg-white border-gray-200"
             }`}
           >
             <h3
@@ -256,7 +221,11 @@ const DashboardPage = () => {
                 { name: "Light", color: "bg-white border-2 border-purple-300" },
                 { name: "Dark", color: "bg-slate-900" },
                 { name: "Corporate", color: "bg-blue-600" },
-                { name: "Creative", color: "bg-gradient-to-r from-pink-500 to-purple-600" },
+                {
+                  name: "Creative",
+                  color:
+                    "bg-gradient-to-r from-pink-500 to-purple-600",
+                },
               ]}
               selectedTemplate={cardData.template}
               onSelectTemplate={handleTemplateSelect}
@@ -269,7 +238,9 @@ const DashboardPage = () => {
         <div className="lg:sticky lg:top-24 lg:h-fit">
           <div
             className={`${
-              isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
+              isDarkMode
+                ? "bg-gray-800 border-gray-700"
+                : "bg-white border-gray-200"
             } rounded-2xl p-8 shadow-lg border transition-all duration-300 hover:shadow-xl`}
           >
             <div className="flex items-center justify-between mb-8">
@@ -281,18 +252,22 @@ const DashboardPage = () => {
                 Live Preview
               </h2>
               <div className="flex items-center space-x-2">
-                <button className={`p-2 rounded-lg transition-all duration-200 ${
+                <button
+                  className={`p-2 rounded-lg transition-all duration-200 ${
                     isDarkMode
                       ? "text-gray-400 hover:text-white hover:bg-gray-700"
                       : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                  }`}>
+                  }`}
+                >
                   {/* … */}
                 </button>
-                <button className={`p-2 rounded-lg transition-all duration-200 ${
+                <button
+                  className={`p-2 rounded-lg transition-all duration-200 ${
                     isDarkMode
                       ? "text-gray-400 hover:text-white hover:bg-gray-700"
                       : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                  }`}>
+                  }`}
+                >
                   {/* … */}
                 </button>
               </div>
@@ -300,11 +275,14 @@ const DashboardPage = () => {
 
             {/* Business Card Preview */}
             <div className="flex justify-center mb-8">
-              <div className="w-full max-w-[400px]" style={{ minWidth: "336px" }}>
+              <div
+                className="w-full max-w-[400px]"
+                style={{ minWidth: "336px" }}
+              >
                 <BusinessCard
                   cardData={{
                     name: cardData.fullName,
-                    title: cardData.jobTitle,
+                    jobTitle: cardData.jobTitle,
                     location: cardData.location,
                     bio: cardData.bio,
                     email: cardData.email,
@@ -323,9 +301,6 @@ const DashboardPage = () => {
                 />
               </div>
             </div>
-
-            {/* Action Buttons */}
-            <ActionButtons buttons={dashboardButtons} isDarkMode={isDarkMode} />
           </div>
         </div>
       </div>
