@@ -1,17 +1,15 @@
-import React from "react";
-
-const QrCode = ({ url, size = "200x200", color = "0-0-0", format = "png" }) => {
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(
-    url
-  )}&size=${size}&color=${color}&format=${format}`;
+const QrCode = ({ profileUrl, size = "200x200", color = "0-0-0", bgColor = "255-255-255", format = "png" }) => {
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}&data=${encodeURIComponent(profileUrl)}&color=${color}&bgcolor=${bgColor}&format=${format}`;
 
   return (
-    <img
-      src={qrUrl}
-      alt="QR code"
-      width={size.split("x")[0]}
-      height={size.split("x")[1]}
-    />
+    <div className="inline-block p-4 bg-white rounded-lg shadow-sm">
+      <img
+        src={qrCodeUrl}
+        alt="QR Code for profile"
+        className="w-full h-auto"
+        style={{ maxWidth: size.split("x")[0] + "px" }}
+      />
+    </div>
   );
 };
 

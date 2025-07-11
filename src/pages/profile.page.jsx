@@ -4,11 +4,11 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import Navbar from "../common/navbar";
 import Footer from "../common/footer";
-import BadgeDisplay from "../components/badge-display";
 import BusinessCard from "../common/business-card";
 import ActionButtons from "../common/action-buttons";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../api/firebase-config";
+import QrCode from "../components/qr-code";
 
 const ProfilePage = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -16,6 +16,7 @@ const ProfilePage = () => {
   const [cardData, setCardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [showQr, setShowQr] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,6 +57,10 @@ const ProfilePage = () => {
 
     fetchData();
   }, [username]);
+
+  const handleGenerateQR = () => {
+    setShowQr(!showQr);
+  };
 
   const handleCopyLink = async () => {
     try {
@@ -124,6 +129,20 @@ END:VCARD`;
       ),
     },
     {
+      label: "Generate QR Code",
+      onClick: handleGenerateQR,
+      icon: (
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M3 3h3v3H3V3zm0 8h3v3H3v-3zm8-8h3v3h-3V3zm0 8h3v3h-3v-3zm8-8h3v3h-3V3zm0 8h3v3h-3v-3zM3 19h18v2H3v-2z"
+          />
+        </svg>
+      ),
+    },
+    {
       label: copied ? "Link Copied!" : "Share Profile",
       onClick: handleShare,
       icon: copied ? (
@@ -150,6 +169,8 @@ END:VCARD`;
         : undefined,
     },
   ];
+
+  const profileUrl = `https://keepcard.app/profile/${cardData?.customUrl}`;
 
   if (loading) {
     return (
@@ -271,11 +292,36 @@ END:VCARD`;
           </div>
 
           <div className="mb-12">
-            <ActionButtons
-              buttons={profileButtons}
-              isDarkMode={isDarkMode}
-            />
+            <ActionButtons buttons={profileButtons} isDarkMode={isDarkMode} />
           </div>
+
+          {showQr && (
+            <div
+              className={`mt-6 p-6 rounded-xl border text-center ${
+                isDarkMode
+                  ? "bg-gray-800 border-gray-700"
+                  : "bg-white border-gray-200 shadow-sm"
+              }`}
+            >
+              <h3
+                className={`text-lg font-semibold mb-4 ${
+                  isDarkMode ? "text-white" : "text-gray-900"
+                }`}
+              >
+                QR Code
+              </h3>
+              <div className="flex justify-center">
+                <QrCode profileUrl={profileUrl} size="200x200" />
+              </div>
+              <p
+                className={`text-sm mt-4 ${
+                  isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
+              >
+                Scan to view this profile
+              </p>
+            </div>
+          )}
 
           <div
             className={`text-center rounded-2xl p-8 shadow-lg border ${
