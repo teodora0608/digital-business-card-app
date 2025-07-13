@@ -66,6 +66,15 @@ const DashboardPage = () => {
     return () => unsub()
   }, [])
 
+useEffect(() => {
+  const unsub = onAuthStateChanged(auth, (user) => {
+    setUserUid(user ? user.uid : null);
++   // de fiecare dată când se schimbă userUid, resetăm poza
++   localStorage.removeItem("profileImage");
+  });
+  
+  return () => unsub();
+}, []);
   // 2️⃣ Fetch user profile once UID is known
   useEffect(() => {
     if (!userUid) return

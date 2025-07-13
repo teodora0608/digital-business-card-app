@@ -1,7 +1,12 @@
+// src/main.jsx
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./index.css";
+
+// ⇒ import pentru react-toastify
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import HomePage from "./pages/home.page.jsx";
 import LoginPage from "./pages/login.page.jsx";
@@ -51,5 +56,15 @@ createRoot(document.getElementById("root")).render(
         <Route path="/profile/:username" element={<ProfilePage />} />
       </Routes>
     </Router>
+
+    {/* ToastContainer montat o singură dată, global */}
+    <ToastContainer
+      position="top-right"
+      autoClose={3000}
+      hideProgressBar={false}
+      newestOnTop
+      closeOnClick
+      pauseOnHover
+    />
   </StrictMode>
 );

@@ -1,3 +1,4 @@
+// src/common/password-field.jsx
 import React, { useState } from "react";
 
 const PasswordField = ({
@@ -7,7 +8,8 @@ const PasswordField = ({
   onChange,
   placeholder = "",
   required = false,
-  minLength
+  minLength,
+  className = ""   // ← accept a className prop
 }) => {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -21,7 +23,7 @@ const PasswordField = ({
         htmlFor={name}
         className="block text-sm font-medium text-gray-300 mb-2"
       >
-        {label}
+        {label}{required && " *"}
       </label>
       <div className="relative">
         <input
@@ -33,7 +35,12 @@ const PasswordField = ({
           placeholder={placeholder}
           required={required}
           minLength={minLength}
-          className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          className={`
+            w-full px-4 py-3 bg-slate-700 border border-slate-600
+            rounded-lg text-white placeholder-gray-400
+            focus:ring-2 focus:ring-purple-500 focus:border-transparent
+            ${className}   /* ← merge in your custom classes */
+          `}
         />
         <button
           type="button"
@@ -52,7 +59,8 @@ const PasswordField = ({
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.657.403-3.217 1.125-4.575M21.878 21.88L2.122 2.12"
+                d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 
+                   0-1.657.403-3.217 1.125-4.575M21.878 21.88L2.122 2.12"
               />
               <path
                 strokeLinecap="round"
@@ -79,7 +87,8 @@ const PasswordField = ({
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 
+                   8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
               />
             </svg>
           )}
