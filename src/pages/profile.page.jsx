@@ -1,3 +1,4 @@
+// src/pages/ProfilePage.jsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -11,13 +12,24 @@ import { db } from "../api/firebase-config";
 import QrCode from "../components/qr-code";
 
 const ProfilePage = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  // Theme persistence in localStorage
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("darkMode") === "true";
+    }
+    return false;
+  });
+  useEffect(() => {
+    localStorage.setItem("darkMode", isDarkMode);
+  }, [isDarkMode]);
+
   const { username } = useParams();
   const [cardData, setCardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [showQr, setShowQr] = useState(false);
 
+  // fetch profile by customUrl
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -25,26 +37,25 @@ const ProfilePage = () => {
           collection(db, "profiles"),
           where("customUrl", "==", username)
         );
-        const querySnapshot = await getDocs(q);
-
-        if (querySnapshot.empty) {
+        const snap = await getDocs(q);
+        if (snap.empty) {
           setCardData(null);
         } else {
-          const userData = querySnapshot.docs[0].data();
+          const d = snap.docs[0].data();
           setCardData({
-            name: userData.fullName,
-            email: userData.email,
-            jobTitle: userData.jobTitle || "",
-            location: userData.location || "",
-            bio: userData.bio || "",
-            phone: userData.phone || "",
-            website: userData.website || "",
-            linkedin: userData.linkedin || "",
-            github: userData.github || "",
-            customUrl: userData.customUrl,
-            template: userData.template || "creative",
-            badges: userData.badges || [],
-            profileImage: userData.profileImage || "",
+            name: d.fullName,
+            email: d.email,
+            jobTitle: d.jobTitle || "",
+            location: d.location || "",
+            bio: d.bio || "",
+            phone: d.phone || "",
+            website: d.website || "",
+            linkedin: d.linkedin || "",
+            github: d.github || "",
+            customUrl: d.customUrl,
+            template: d.visualTemplate || "creative",
+            badges: d.badges || [],
+            profileImage: d.profileImage || "",
           });
         }
       } catch (err) {
@@ -54,27 +65,19 @@ const ProfilePage = () => {
         setLoading(false);
       }
     };
-
     fetchData();
   }, [username]);
 
-  const handleGenerateQR = () => {
-    setShowQr(!showQr);
-  };
-
+  const handleGenerateQR = () => setShowQr(v => !v);
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error("Failed to copy link:", err);
-    }
+    } catch (e) { console.error(e) }
   };
-
   const handleDownloadContact = () => {
     if (!cardData) return;
-
     const vCard = `BEGIN:VCARD
 VERSION:3.0
 FN:${cardData.name}
@@ -84,30 +87,23 @@ TEL:${cardData.phone}
 URL:${cardData.website}
 NOTE:${cardData.bio}
 END:VCARD`;
-
     const blob = new Blob([vCard], { type: "text/vcard" });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${cardData.name.replace(/\s+/g, "_")}_contact.vcf`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${cardData.name.replace(/\s+/g, "_")}.vcf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
-
-  const handleShare = async () => {
+  const handleShare = () => {
     if (navigator.share) {
-      try {
-        await navigator.share({
-          title: `${cardData.name} - Digital Business Card`,
-          text: `Check out ${cardData.name}'s digital business card`,
-          url: window.location.href,
-        });
-      } catch (err) {
-        console.log("Error sharing:", err);
-        handleCopyLink();
-      }
+      navigator.share({
+        title: `${cardData.name} – Digital Business Card`,
+        text: `Check out ${cardData.name}'s card!`,
+        url: window.location.href,
+      }).catch(() => handleCopyLink());
     } else {
       handleCopyLink();
     }
@@ -119,12 +115,10 @@ END:VCARD`;
       onClick: handleDownloadContact,
       icon: (
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-          />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 
+               012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 
+               0 01.293.707V19a2 2 0 01-2 2z"/>
         </svg>
       ),
     },
@@ -133,12 +127,10 @@ END:VCARD`;
       onClick: handleGenerateQR,
       icon: (
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M3 3h3v3H3V3zm0 8h3v3H3v-3zm8-8h3v3h-3V3zm0 8h3v3h-3v-3zm8-8h3v3h-3V3zm0 8h3v3h-3v-3zM3 19h18v2H3v-2z"
-          />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M3 3h3v3H3V3zm0 8h3v3H3v-3zm8-8h3v3h-3V3zm0 
+               8h3v3h-3v-3zm8-8h3v3h-3V3zm0 8h3v3h-3v-3zM3 
+               19h18v2H3v-2z"/>
         </svg>
       ),
     },
@@ -147,21 +139,20 @@ END:VCARD`;
       onClick: handleShare,
       icon: copied ? (
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M5 13l4 4L19 7"
-          />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M5 13l4 4L19 7"/>
         </svg>
       ) : (
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
-          />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M8.684 13.342C8.886 12.938 9 12.482 
+               9 12c0-.482-.114-.938-.316-1.342m0 
+               2.684a3 3 0 110-2.684m0 2.684l6.632 
+               3.316m-6.632-6l6.632-3.316m0 
+               0a3 3 0 105.367-2.684 3 3 0 
+               00-5.367 2.684zm0 9.316a3 3 0 
+               105.367 2.684 3 3 0 
+               00-5.367-2.684z"/>
         </svg>
       ),
       extraClasses: copied
@@ -174,26 +165,12 @@ END:VCARD`;
 
   if (loading) {
     return (
-      <div
-        className={`min-h-screen transition-all duration-500 ${
-          isDarkMode ? "bg-gray-900" : "bg-white"
-        } flex items-center justify-center`}
-      >
-        <div className="text-center">
-          <div className="w-16 h-16 bg-gradient-to-r from-fuchsia-500 to-violet-600 rounded-3xl flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <svg
-              className="w-8 h-8 text-white"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M4 4h16v2H4V4zm0 4h16v2H4V8zm0 4h16v2H4v-2zm0 4h16v2H4v-2z" />
-            </svg>
-          </div>
-          <p
-            className={`${
-              isDarkMode ? "text-gray-300" : "text-gray-600"
-            } font-medium`}
-          >
+      <div className={`min-h-screen flex items-center justify-center ${
+        isDarkMode ? "bg-gray-900" : "bg-white"
+      }`}>
+        <div className="text-center animate-pulse">
+          <div className="w-16 h-16 bg-gradient-to-r from-fuchsia-500 to-violet-600 rounded-3xl mx-auto mb-4" />
+          <p className={isDarkMode ? "text-gray-300" : "text-gray-600"}>
             Loading profile...
           </p>
         </div>
@@ -203,59 +180,15 @@ END:VCARD`;
 
   if (!cardData) {
     return (
-      <div
-        className={`min-h-screen transition-all duration-500 ${
-          isDarkMode ? "bg-gray-900" : "bg-white"
-        } flex items-center justify-center`}
-      >
-        <div className="text-center max-w-md mx-auto px-6">
-          <div className="w-16 h-16 bg-gray-300 rounded-3xl flex items-center justify-center mx-auto mb-6">
-            <svg
-              className="w-8 h-8 text-gray-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-              />
-            </svg>
-          </div>
-          <h1
-            className={`text-2xl font-bold ${
-              isDarkMode ? "text-white" : "text-gray-900"
-            } mb-4`}
-          >
+      <div className={`min-h-screen flex items-center justify-center ${
+        isDarkMode ? "bg-gray-900" : "bg-white"
+      }`}>
+        <div className="text-center max-w-md px-6">
+          <h1 className={isDarkMode ? "text-white" : "text-gray-900"}>
             Profile Not Found
           </h1>
-          <p
-            className={`${
-              isDarkMode ? "text-gray-400" : "text-gray-600"
-            } mb-8`}
-          >
-            The profile you're looking for doesn't exist or has been removed.
-          </p>
-          <Link
-            to="/"
-            className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white rounded-lg font-semibold hover:from-fuchsia-600 hover:to-violet-700 transition-all duration-200"
-          >
-            <svg
-              className="w-5 h-5 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              />
-            </svg>
-            Back to Home
+          <Link to="/" className="mt-6 inline-block bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white px-6 py-3 rounded-lg">
+            ← Back to Home
           </Link>
         </div>
       </div>
@@ -263,117 +196,36 @@ END:VCARD`;
   }
 
   return (
-    <div
-      className={`min-h-screen transition-all duration-500 ${
-        isDarkMode ? "bg-gray-900" : "bg-white"
-      }`}
-    >
-      <Navbar
-        isDarkMode={isDarkMode}
-        setIsDarkMode={setIsDarkMode}
-        showShare={true}
-        showGetStarted={true}
-        showLogout={false}
-        showProfileLink={false}
-        cardData={null}
-      />
-
+    <div className={`min-h-screen ${isDarkMode ? "bg-gray-900" : "bg-white"}`}>
+<Navbar
+  isDarkMode={isDarkMode}
+  setIsDarkMode={setIsDarkMode}
+  showShare={true}
+  showGetStarted={false}
+  showLogout={false}
+  showProfileLink={false}
+  showLogin={false}       // ← ascunde Sign In
+  cardData={null}
+/>
       <main className="container mx-auto px-6 py-12">
-        <div className="max-w-md mx-auto">
-          <div className="mb-12">
-            <BusinessCard
-              cardData={cardData}
-              selectedBadges={cardData.badges || []}
-              isDarkMode={isDarkMode}
-              showProfilePhoto={true}
-              isClickable={true}
-              variant="standalone"
-            />
-          </div>
-
-          <div className="mb-12">
-            <ActionButtons buttons={profileButtons} isDarkMode={isDarkMode} />
-          </div>
-
+        <div className="max-w-md mx-auto space-y-12">
+          <BusinessCard
+            cardData={cardData}
+            selectedBadges={cardData.badges}
+            isDarkMode={isDarkMode}
+            showProfilePhoto
+            isClickable
+            variant="standalone"
+          />
+          <ActionButtons buttons={profileButtons} isDarkMode={isDarkMode} />
           {showQr && (
-            <div
-              className={`mt-6 p-6 rounded-xl border text-center ${
-                isDarkMode
-                  ? "bg-gray-800 border-gray-700"
-                  : "bg-white border-gray-200 shadow-sm"
-              }`}
-            >
-              <h3
-                className={`text-lg font-semibold mb-4 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}
-              >
-                QR Code
-              </h3>
-              <div className="flex justify-center">
-                <QrCode profileUrl={profileUrl} size="200x200" />
-              </div>
-              <p
-                className={`text-sm mt-4 ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
-              >
-                Scan to view this profile
-              </p>
+            <div className={`p-6 rounded-xl border ${
+              isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
+            }`}>
+              <h3 className={isDarkMode ? "text-white" : "text-gray-900"}>QR Code</h3>
+              <QrCode profileUrl={profileUrl} size="200x200" />
             </div>
           )}
-
-          <div
-            className={`text-center rounded-2xl p-8 shadow-lg border ${
-              isDarkMode
-                ? "bg-gray-800 border-gray-700"
-                : "bg-white border-gray-200"
-            }`}
-          >
-            <div className="w-12 h-12 bg-gradient-to-r from-fuchsia-500 to-violet-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-6 h-6 text-white"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="M4 4h16v2H4V4zm0 4h16v2H4V8zm0 4h16v2H4v-2zm0 4h16v2H4v-2z" />
-              </svg>
-            </div>
-            <h2
-              className={`text-xl font-bold ${
-                isDarkMode ? "text-white" : "text-gray-900"
-              } mb-2`}
-            >
-              Create Your Own Digital Business Card
-            </h2>
-            <p
-              className={`${
-                isDarkMode ? "text-gray-400" : "text-gray-600"
-              } mb-6`}
-            >
-              Join thousands of professionals who use KeepCard to share their
-              contact information instantly.
-            </p>
-            <Link
-              to="/register"
-              className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-fuchsia-500 to-violet-600 text-white rounded-lg font-semibold hover:from-fuchsia-600 hover:to-violet-700 transition-all duration-200 hover:scale-105"
-            >
-              Get Started Free
-              <svg
-                className="w-5 h-5 ml-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </Link>
-          </div>
         </div>
       </main>
 

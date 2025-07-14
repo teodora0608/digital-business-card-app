@@ -15,8 +15,17 @@ import VisualTemplate from "../common/visual-template"
 import SaveChanges from "../common/save-changes"
 
 const DashboardPage = () => {
-  // Theme & save state
-  const [isDarkMode, setIsDarkMode] = useState(false)
+  // Theme & save state (persist în localStorage)
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("darkMode") === "true"
+    }
+    return false
+  })
+  useEffect(() => {
+    localStorage.setItem("darkMode", isDarkMode)
+  }, [isDarkMode])
+
   const [isSaved, setIsSaved] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
 
@@ -66,15 +75,15 @@ const DashboardPage = () => {
     return () => unsub()
   }, [])
 
-useEffect(() => {
-  const unsub = onAuthStateChanged(auth, (user) => {
-    setUserUid(user ? user.uid : null);
-+   // de fiecare dată când se schimbă userUid, resetăm poza
-+   localStorage.removeItem("profileImage");
-  });
-  
-  return () => unsub();
-}, []);
+  // resetare poza la schimbarea UID
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      setUserUid(user ? user.uid : null)
+      localStorage.removeItem("profileImage")
+    })
+    return () => unsub()
+  }, [])
+
   // 2️⃣ Fetch user profile once UID is known
   useEffect(() => {
     if (!userUid) return
@@ -112,9 +121,7 @@ useEffect(() => {
               ),
             github:
               !details.github ||
-              /^(https?:\/\/)?(www\.)?github\.com\/.+$/.test(
-                details.github
-              ),
+              /^(https?:\/\/)?(www\.)?github\.com\/.+$/.test(details.github),
           })
         }
       } catch (err) {
