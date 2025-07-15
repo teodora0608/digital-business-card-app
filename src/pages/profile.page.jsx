@@ -12,7 +12,6 @@ import { db } from "../api/firebase-config";
 import QrCode from "../components/qr-code";
 
 const ProfilePage = () => {
-  // Theme persistence in localStorage
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("darkMode") === "true";
@@ -29,7 +28,6 @@ const ProfilePage = () => {
   const [copied, setCopied] = useState(false);
   const [showQr, setShowQr] = useState(false);
 
-  // fetch profile by customUrl
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -181,8 +179,9 @@ END:VCARD`;
     },
   ];
 
-  // ✅ MODIFICARE: folosim linkul Netlify
-  const profileUrl = `https://effulgent-sprite-fbbc2a.netlify.app/profile/${cardData?.customUrl}`;
+  // ✅ MODIFICARE: facem link-ul dinamic
+  const domain = window.location.origin;
+  const profileUrl = `${domain}/profile/${cardData?.customUrl}`;
 
   if (loading) {
     return (
@@ -232,7 +231,7 @@ END:VCARD`;
         showGetStarted={false}
         showLogout={false}
         showProfileLink={false}
-        showLogin={false} // ← ascunde Sign In
+        showLogin={false}
         cardData={null}
       />
       <main className="container mx-auto px-6 py-12">
@@ -254,11 +253,7 @@ END:VCARD`;
                   : "bg-white border-gray-200"
               }`}
             >
-              <h3
-                className={
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }
-              >
+              <h3 className={isDarkMode ? "text-white" : "text-gray-900"}>
                 QR Code
               </h3>
               <div className="flex justify-center">

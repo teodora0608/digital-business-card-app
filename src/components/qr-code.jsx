@@ -1,5 +1,3 @@
-// src/common/QrCode.jsx
-
 const QrCode = ({
   profileUrl,
   size = "200x200",
@@ -7,8 +5,11 @@ const QrCode = ({
   bgColor = "255-255-255",
   format = "png",
 }) => {
+  const appDomain = window.location.origin;
+  const fullUrl = `${appDomain}/${profileUrl}`;
+
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}&data=${encodeURIComponent(
-    profileUrl
+    fullUrl
   )}&color=${color}&bgcolor=${bgColor}&format=${format}`;
 
   return (
