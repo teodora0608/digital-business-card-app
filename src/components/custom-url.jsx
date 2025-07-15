@@ -93,9 +93,10 @@ const CustomUrl = ({
           ${isDarkMode ? "bg-gray-700 border-gray-600" : "bg-gray-50 border-gray-200"}
           focus-within:ring-2 focus-within:ring-purple-500 transition-all duration-200`}
       >
-        <span className={`${isDarkMode ? "text-gray-400" : "text-gray-600"} text-sm font-medium`}>
-          keepcard.app/
-        </span>
+<span className={`${isDarkMode ? "text-gray-400" : "text-gray-600"} text-sm font-medium`}>
+  {window.location.origin}/
+</span>
+
         <input
           type="text"
           name="customUrl"
